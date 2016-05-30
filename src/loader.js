@@ -30,7 +30,7 @@ bower.dir = "../.." ;      //bower base directory
 bower.pkgCount = 0 ;       //number of package that have been loaded
 bower.loadingCount = 0 ;   //have many package are in loading process
 bower.total = 0 ;          //total number of packages that must to be loaded
-bower.packageTree = [] ;   //packages's configuration registry 
+bower.packagesTree = [] ;   //packages's configuration registry 
 
 /**
  * get the text reponse throught an ajax request from a given path
@@ -111,14 +111,36 @@ bower.xhrGet = function (path, isAsync, callback) {
     }  
 } ;
 
+/**
+ * helpfull to determine if a package is in the packages's configuration registry
+ * @param   {string} pkgName the name of the package
+ * @returns {number} index of the first occurrence of the given package. -1 if it's isn't in the registry.
+ */
+bower.packageIndex = function (pkgName) {
+  
+    if (typeof pkgName !== "string" && !(pkgName instanceof String)) {
+
+        console.error("bowerder:packageIndex: argument must be a string" );
+    }
+    else {
+        
+        for (i in bower.packagesTree) {
+
+            if (bower.packagesTree[i].name === pkgName) return i ;
+        }
+    }
+    
+    return -1 ;
+} ;
+
 bower.addPackage = function (pkgName, pkgCaller) {
     
     if (typeof pkgName !== "string" && !(pkgName instanceof String)) {
         
-        console.error("bowerder:addPackage: first argument must be a string" );
+        console.error("bowerder:addPackage: argument must be a string" );
         return null ;
     }
-    if (pkgCaller && !(pkgCaller instanceof Object)) console.warn("bowerder:addPackage: second argument must be an object") ;
+    if (pkgCaller && (typeof pkgCaller !== "string") && !(pkgCaller instanceof String)) console.warn("bowerder:addPackage: argument must be a string") ;
     
     var isAlreadyOk = false ;
     
@@ -126,13 +148,13 @@ bower.addPackage = function (pkgName, pkgCaller) {
      * if it's a dependency, check if it's present in the registry before package of which depends.
      * if so, nothing will be done, else the adding operation to the registry will be process.
     */
-    for( var i=0; i < bower.packageTree.length; i++) {
+    for (i in bower.packagesTree.length) {
         
-        if (bower.packageTree[i].name === pkgName ) {
+        if (bower.packagesTree[i].name === pkgName ) {
             
             isAlreadyOk = true ;
             
-            if ((pkgCaller instanceof Object) && (bower.packageTree.indexOf( pkgCaller ) != -1) && (bower.packageTree.indexOf( pkgCaller ) < i)) isAlreadyOk = false ;
+            if (pkgCaller && (bower.packageIndex( pkgCaller ) != -1) && (bower.packageIndex( pkgCaller ) < i)) isAlreadyOk = false ;
             
             break ;
         }
@@ -165,16 +187,16 @@ bower.addPackage = function (pkgName, pkgCaller) {
                  * therefore, it have to be added before the `pkgCaller` in the packages's configuration registry.
                  * else it's a just a package to add in the considered registry.
                 */
-                if (pkgCaller instanceof Object) {
+                if (pkgCaller) {
 
-                    if (bower.packageTree.indexOf( pkgCaller ) != -1) {
+                    if (bower.packageIndex( pkgCaller ) != -1) {
 
-                        bower.packageTree.splice( bower.packageTree.indexOf( pkgCaller ), 0, pkgConfig) ;
+                        bower.packagesTree.splice( bower.packageIndex( pkgCaller ), 0, pkgConfig) ;
                     }
                 }
                 else {
 
-                    bower.packageTree.push( pkgConfig ) ;
+                    bower.packagesTree.push( pkgConfig ) ;
                 }
 
                 //if the current loading package have dependencies, then also process their loading
@@ -184,7 +206,7 @@ bower.addPackage = function (pkgName, pkgCaller) {
 
                     pkgDeps.forEach( function (name) {
 
-                        bower.addPackage( name, pkgConfig) ;
+                        bower.addPackage( name, pkgConfig["name"]) ;
                     }) ;
                 }
             }
@@ -199,13 +221,13 @@ bower.addPackage = function (pkgName, pkgCaller) {
             if (bower.loadingCount === 0) {
                 
                 //be sure to have unique package occurence in package's tree
-                for (var i=0; i < bower.packageTree.length; i++) {
+                for (var i=0; i < bower.packagesTree.length; i++) {
                     
-                    for (var j=i+1; j < bower.packageTree.length; j++) {
+                    for (var j=i+1; j < bower.packagesTree.length; j++) {
                     
-                        if (bower.packageTree[i].name === bower.packageTree[j].name) {
+                        if (bower.packagesTree[i].name === bower.packagesTree[j].name) {
                             
-                            bower.packageTree.splice( j, 1) ;
+                            bower.packagesTree.splice( j, 1) ;
                             j-- ;
                         }
                     }
@@ -213,7 +235,7 @@ bower.addPackage = function (pkgName, pkgCaller) {
                 
                 var pkgScriptTag = undefined ;
                 
-                bower.packageTree.forEach( function (pkg) {
+                bower.packagesTree.forEach( function (pkg) {
                     
                     if (typeof pkg.main === "string") {
                         
@@ -232,7 +254,7 @@ bower.addPackage = function (pkgName, pkgCaller) {
                     }
                 }) ;
                 
-                console.log(bower.packageTree) ;
+                console.log(bower.packagesTree) ;
             }
         }) ;
     }
