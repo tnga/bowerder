@@ -237,20 +237,12 @@ bower.addPackage = function (pkgName, pkgCaller) {
                 
                 bower.packagesTree.forEach( function (pkg) {
                     
-                    if (typeof pkg.main === "string") {
-                        
+                    if (typeof pkg.main === "string") pkg.main = [pkg.main] ;
+                    for (index in pkg.main) {
+
                         pkgScriptTag = document.createElement("script") ;
-                        pkgScriptTag.src = bower.dir +"/"+ pkg.name +"/"+ pkg.main ;
+                        pkgScriptTag.src = bower.dir +"/"+ pkg.name +"/"+  pkg.main[index] ;
                         document.head.appendChild( pkgScriptTag ) ;
-                    }
-                    else {
-                        
-                        for (index in pkg.main) {
-                            
-                            pkgScriptTag = document.createElement("script") ;
-                            pkgScriptTag.src = bower.dir +"/"+ pkg.name +"/"+  pkg.main[index] ;
-                            document.head.appendChild( pkgScriptTag ) ;
-                        }
                     }
                 }) ;
                 
