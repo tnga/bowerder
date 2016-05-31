@@ -133,6 +133,34 @@ bower.packageIndex = function (pkgName) {
     return -1 ;
 } ;
 
+bower.parseTagType = function (targetFile) {
+  
+    if (typeof targetFile !== "string" && !(targetFile instanceof String)) {
+
+        console.error("bowerder:parseTagType: argument must be a string" );
+    }
+    
+    var tag = {name: "unknow", type: "unknow"} ;
+    
+    if (/\.js$/.test( targetFile )) { //it's a js like file
+        
+        tag.name = "script" ;
+        tag.type = "text/javascript" ;        
+    }
+    if (/\.css$/.test( targetFile ) || /\.scss$/.test( targetFile ) || /\.sass$/.test( targetFile ) || /\.less$/.test( targetFile )) { //it's a css like
+        
+        tag.name = "link" ;
+        tag.type = "text/css" ;
+
+        if (/\.css$/.test( targetFile )) tag.rel = "stylesheet" ;
+        if (/\.scss$/.test( targetFile )) tag.rel = "stylesheet/scss" ;
+        if (/\.sass$/.test( targetFile )) tag.rel = "stylesheet/sass" ;
+        if (/\.less$/.test( targetFile )) tag.rel = "stylesheet/less" ;            
+    }
+    
+    return tag ;
+} ;
+
 bower.addPackage = function (pkgName, pkgCaller) {
     
     if (typeof pkgName !== "string" && !(pkgName instanceof String)) {
@@ -233,17 +261,49 @@ bower.addPackage = function (pkgName, pkgCaller) {
                     }
                 }
                 
-                var pkgScriptTag = undefined ;
+                var pkgScriptTags = [] ,
+                    pkgLinkTags = [] ,
+                    pkgLoaderTags = [] ,
+                    loaderTag = undefined ,
+                    getTag = undefined ; //supported tag
                 
                 bower.packagesTree.forEach( function (pkg) {
                     
                     if (typeof pkg.main === "string") pkg.main = [pkg.main] ;
+                    
                     for (index in pkg.main) {
 
-                        pkgScriptTag = document.createElement("script") ;
-                        pkgScriptTag.src = bower.dir +"/"+ pkg.name +"/"+  pkg.main[index] ;
-                        document.head.appendChild( pkgScriptTag ) ;
+                        getTag = bower.parseTagType( pkg.main[index] ) ;
+                        
+                        if (getTag.name === "script") {
+                            
+                            loaderTag = document.createElement("script") ;
+                            loaderTag.type = getTag.type ;
+                            loaderTag.src = bower.dir +"/"+ pkg.name +"/"+ pkg.main[index] ;
+                            
+                            pkgScriptTags.push( loaderTag ) ;
+                        }
+                        if (getTag.name === "link") {
+                            
+                            loaderTag = document.createElement("link") ;
+                            loaderTag.rel = getTag.rel ;
+                            loaderTag.type = getTag.type ;
+                            loaderTag.href = bower.dir +"/"+ pkg.name +"/"+ pkg.main[index] ;
+                            
+                            pkgLinkTags.push( loaderTag ) ;
+                        }  
+                        if (getTag.name === "unknow") {
+                            
+                            //console.warn("bowerder: unable to load unsupported file: "+ bower.dir +"/"+ pkg.name +"/"+ pkg.main[index]) ;
+                        }                       
                     }
+                    
+                    pkgLoaderTags = pkgLinkTags.concat( pkgScriptTags ) ;
+                    
+                    pkgLoaderTags.forEach( function (importTag) {
+                       
+                        document.head.appendChild( importTag ) ;
+                    }) ;
                 }) ;
                 
                 console.log(bower.packagesTree) ;
