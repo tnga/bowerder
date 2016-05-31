@@ -182,7 +182,16 @@ bower.addPackage = function (pkgName, pkgCaller) {
             
             isAlreadyOk = true ;
             
-            if (pkgCaller && (bower.packageIndex( pkgCaller ) != -1) && (bower.packageIndex( pkgCaller ) < i)) isAlreadyOk = false ;
+            if (pkgCaller && (bower.packageIndex( pkgCaller ) != -1) ) {
+                /* major browsers load and execute script included by another script asynchronously.
+                 * the problem here is that, package which have dependencies have to be execute after them.
+                 * therefore, for these package, it's primordial to load them synchronously.
+                */
+                //bower.packagesTree[i].browser.async = false ;
+                bower.packagesTree[ bower.packageIndex( pkgCaller ) ].browser.async = false ;
+                
+                if (bower.packageIndex( pkgCaller ) < i) isAlreadyOk = false ;
+            }
             
             break ;
         }
@@ -210,20 +219,28 @@ bower.addPackage = function (pkgName, pkgCaller) {
                 delete pkgConfig['keywords'] ;
                 delete pkgConfig['moduleType'] ;
                 delete pkgConfig['resolutions'] ;
-
+                
+                if (!(pkgConfig.browser instanceof Object)) pkgConfig.browser = {} ;
+                //by default, load and execute script asynchronously
+                pkgConfig.browser.async = true ;
+                
                 /* if `pkgCaller` is set, then current loading package adress by `pkgName` is a dependency.
                  * therefore, it have to be added before the `pkgCaller` in the packages's configuration registry.
                  * else it's a just a package to add in the considered registry.
                 */
                 if (pkgCaller) {
-
+                    
+                    //mark package to be synchronously loaded and executed
+                    //pkgConfig.browser.async = false ;
+                    bower.packagesTree[ bower.packageIndex( pkgCaller ) ].browser.async = false ;
+                    
                     if (bower.packageIndex( pkgCaller ) != -1) {
 
                         bower.packagesTree.splice( bower.packageIndex( pkgCaller ), 0, pkgConfig) ;
                     }
                 }
                 else {
-
+                    
                     bower.packagesTree.push( pkgConfig ) ;
                 }
 
@@ -279,6 +296,7 @@ bower.addPackage = function (pkgName, pkgCaller) {
                             
                             loaderTag = document.createElement("script") ;
                             loaderTag.type = getTag.type ;
+                            loaderTag.async = pkg.browser.async ;
                             loaderTag.src = bower.dir +"/"+ pkg.name +"/"+ pkg.main[index] ;
                             
                             pkgScriptTags.push( loaderTag ) ;
