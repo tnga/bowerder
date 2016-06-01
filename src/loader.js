@@ -133,6 +133,11 @@ bower.packageIndex = function (pkgName) {
     return -1 ;
 } ;
 
+/**
+ * helpfull to determine which html tag have to be used to import a component in the DOM
+ * @param   {string} targetFile component's file to include
+ * @returns {object} an object that contains informations about html tag to use
+ */
 bower.parseTagType = function (targetFile) {
   
     if (typeof targetFile !== "string" && !(targetFile instanceof String)) {
@@ -176,7 +181,7 @@ bower.addPackage = function (pkgName, pkgCaller) {
      * if it's a dependency, check if it's present in the registry before package of which depends.
      * if so, nothing will be done, else the adding operation to the registry will be process.
     */
-    for (i in bower.packagesTree.length) {
+    for (i in bower.packagesTree) {
         
         if (bower.packagesTree[i].name === pkgName ) {
             
@@ -187,7 +192,7 @@ bower.addPackage = function (pkgName, pkgCaller) {
                  * the problem here is that, package which have dependencies have to be execute after them.
                  * therefore, for these package, it's primordial to load them synchronously.
                 */
-                //bower.packagesTree[i].browser.async = false ;
+                bower.packagesTree[i].browser.async = false ;
                 bower.packagesTree[ bower.packageIndex( pkgCaller ) ].browser.async = false ;
                 
                 if (bower.packageIndex( pkgCaller ) < i) isAlreadyOk = false ;
@@ -231,7 +236,7 @@ bower.addPackage = function (pkgName, pkgCaller) {
                 if (pkgCaller) {
                     
                     //mark package to be synchronously loaded and executed
-                    //pkgConfig.browser.async = false ;
+                    pkgConfig.browser.async = false ;
                     bower.packagesTree[ bower.packageIndex( pkgCaller ) ].browser.async = false ;
                     
                     if (bower.packageIndex( pkgCaller ) != -1) {
@@ -280,7 +285,7 @@ bower.addPackage = function (pkgName, pkgCaller) {
                 
                 var pkgScriptTags = [] ,
                     pkgLinkTags = [] ,
-                    pkgLoaderTags = [] ,
+                    isAlreadyLoaded = false ,
                     loaderTag = undefined ,
                     getTag = undefined ; //supported tag
                 
@@ -288,43 +293,68 @@ bower.addPackage = function (pkgName, pkgCaller) {
                     
                     if (typeof pkg.main === "string") pkg.main = [pkg.main] ;
                     
-                    for (index in pkg.main) {
+                    isAlreadyLoaded = false ;
+                    /* before include a loader tag in the DOM, it's primordial to check if the associated file isn't already loaded in.
+                     * this assure to have an unique instance of a package in the DOM include by our `bower loader`.
+                    */
+                    if (document.querySelector) {
+                        //efficient : this is for all major browsers and IE>8
+                        if (document.head.querySelector('[data-bowerpkg ="'+pkg.name+'"]')) isAlreadyLoaded = true ;
+                    }
+                    else { //alternative with more hack : this is specialy for IE<=8
+                                                
+                        var domLoaderTags = [].slice.call( document.head.getElementsByTagName("link") ) ;
+                            domLoaderTags = domLoaderTags.concat( [].slice.call( document.head.getElementsByTagName("scrpit") ) ) ;
+                        for (var j=0; j < domLoaderTags.length; j++) {
 
-                        getTag = bower.parseTagType( pkg.main[index] ) ;
-                        
-                        if (getTag.name === "script") {
-                            
-                            loaderTag = document.createElement("script") ;
-                            loaderTag.type = getTag.type ;
-                            loaderTag.async = pkg.browser.async ;
-                            loaderTag.src = bower.dir +"/"+ pkg.name +"/"+ pkg.main[index] ;
-                            
-                            pkgScriptTags.push( loaderTag ) ;
+                            if (domLoaderTags[j].getAttribute("data-bowerpkg") === pkg.name ) {
+
+                                isAlreadyLoaded = true ;
+                                break ;
+                            }
                         }
-                        if (getTag.name === "link") {
-                            
-                            loaderTag = document.createElement("link") ;
-                            loaderTag.rel = getTag.rel ;
-                            loaderTag.type = getTag.type ;
-                            loaderTag.href = bower.dir +"/"+ pkg.name +"/"+ pkg.main[index] ;
-                            
-                            pkgLinkTags.push( loaderTag ) ;
-                        }  
-                        if (getTag.name === "unknow") {
-                            
-                            //console.warn("bowerder: unable to load unsupported file: "+ bower.dir +"/"+ pkg.name +"/"+ pkg.main[index]) ;
-                        }                       
                     }
                     
-                    pkgLoaderTags = pkgLinkTags.concat( pkgScriptTags ) ;
-                    
-                    pkgLoaderTags.forEach( function (importTag) {
-                       
-                        document.head.appendChild( importTag ) ;
-                    }) ;
+                    if (!isAlreadyLoaded) {
+                        
+                        for (index in pkg.main) {
+
+                            getTag = bower.parseTagType( pkg.main[index] ) ;
+
+                            if (getTag.name === "script") { 
+
+                                loaderTag = document.createElement("script") ;
+                                loaderTag.setAttribute("data-bowerpkg", pkg.name) ;
+                                loaderTag.type = getTag.type ;
+                                loaderTag.async = pkg.browser.async ;
+                                loaderTag.src = bower.dir +"/"+ pkg.name +"/"+ pkg.main[index] ;
+
+                                pkgScriptTags.push( loaderTag ) ;
+                            }
+                            if (getTag.name === "link") {
+
+                                loaderTag = document.createElement("link") ;
+                                loaderTag.setAttribute("data-bowerpkg", pkg.name) ;
+                                loaderTag.rel = getTag.rel ;
+                                loaderTag.type = getTag.type ;
+                                loaderTag.href = bower.dir +"/"+ pkg.name +"/"+ pkg.main[index] ;
+
+                                pkgLinkTags.push( loaderTag ) ;
+                            }  
+                            if (getTag.name === "unknow") {
+
+                                //console.warn("bowerder: unable to load unsupported file: "+ bower.dir +"/"+ pkg.name +"/"+ pkg.main[index]) ;
+                            }                       
+                        }
+                    }
                 }) ;
                 
-                console.log(bower.packagesTree) ;
+                pkgLinkTags.concat( pkgScriptTags ).forEach( function(loaderTag) {
+                    
+                    document.head.appendChild( loaderTag ) ;
+                }) ;
+                
+                console.log( bower.packagesTree ) ;
             }
         }) ;
     }
