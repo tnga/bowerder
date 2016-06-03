@@ -219,30 +219,25 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
      * if it's a dependency, check if it's present in the registry before package of which depends.
      * if so, nothing will be done, else the adding operation to the registry will be process.
     */
-    for (i in bower.packagesTree) {
+    if (bower.package( pkgName )) {
         
-        if (bower.packagesTree[i].name === pkgName ) {
-            
-            isAlreadyOk = true ;
-            
-            //if the package is already fully loaded *in the DOM*, the current associated callback is executed.
-            if (cbIndex && bower.packagesTree[i].browser.loaded && bower.callbacks[ pkgName ]) {
-                
-                bower.callbacks[ pkgName ][cbIndex]( bower.packagesTree[i].browser.status ) ;
-            }
-            
-            if (pkgCaller && (bower.packageIndex( pkgCaller ) != -1) ) {
-                /* major browsers load and execute script included by another script asynchronously.
-                 * the problem here is that, package which have dependencies have to be execute after them.
-                 * therefore, for these package, it's primordial to load them synchronously.
-                */
-                bower.packagesTree[i].browser.async = false ;
-                bower.packagesTree[ bower.packageIndex( pkgCaller ) ].browser.async = false ;
-                
-                if (bower.packageIndex( pkgCaller ) < i) isAlreadyOk = false ;
-            }
-            
-            break ;
+        isAlreadyOk = true ;
+
+        //if the package is already fully loaded *in the DOM*, the current associated callback is executed.
+        if (cbIndex && bower.package( pkgName ).browser.loaded && bower.callbacks[ pkgName ]) {
+
+            bower.callbacks[ pkgName ][cbIndex]( bower.package( pkgName ).browser.status ) ;
+        }
+        
+        if (pkgCaller && (bower.packageIndex( pkgCaller ) != -1) ) {
+            /* major browsers load and execute script included by another script asynchronously.
+             * the problem here is that, package which have dependencies have to be execute after them.
+             * therefore, for these package, it's primordial to load them synchronously.
+            */
+            bower.package( pkgName ).browser.async = false ;
+            bower.package( pkgCaller ).browser.async = false ;
+
+            if (bower.packageIndex( pkgCaller ) < bower.packageIndex( pkgName )) isAlreadyOk = false ;
         }
     }
     
