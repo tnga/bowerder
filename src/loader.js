@@ -163,6 +163,30 @@ bower.package = function (pkgName) {
 } ;
 
 /**
+ * check the correct moment to execute callbacks associated to a package and do it.
+ * @param {string} pkgName the name of a package
+ */
+bower.checkCallback = function (pkgName) {
+    
+    /* the hack here is to be sure that all associated main files of considered package are loaded in the browser.
+         * this is checked with a counter which content the number of main files that was loaded (event if the loading fail with browser loading process).
+         * therefore the package is fully imported when the counter is equal to total of the package's main files.
+         * callback is executed only if the package is fully imported.
+        */
+    if (!bower.package( pkgName ).browser.loaded) bower.package( pkgName ).browser.counter++ ;
+
+    if (bower.package( pkgName ).browser.counter === bower.package( pkgName ).main.length) {
+
+        bower.package( pkgName ).browser.loaded = true ; 
+
+        bower.callbacks[ pkgName ].forEach( function (callback) {
+
+            callback( bower.package( pkgName ).browser.status ) ;
+        });
+    }
+}
+
+/**
  * helpfull to determine which html tag have to be used to import a component in the DOM
  * @param   {string} targetFile component's file to include
  * @returns {object} an object that contains informations about html tag to use
@@ -252,7 +276,8 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                 bower.loadingCount-- ;
                 console.error("bowerder:addPackage: unable to load `"+ pkgName +"` component." );
                 
-                /* considering that the package will not be imported, 
+                /* considering that the package will not be imported and
+                 * then will not be added to the packages's configuration registry,
                  * associated callback functions are executed with status error from bowerder.
                 */
                 if ((typeof cbIndex === "number" || cbIndex instanceof Number) && bower.callbacks[ pkgName ]) {
@@ -357,49 +382,46 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                         return null ;
                     }
                     
-                    bower.callbacks[ pkgName ].forEach( function (callback) {
+                    //Set up load listener. Test attachEvent first because IE9 has
+                    //a subtle issue in its addEventListener and script onload firings
+                    //that do not match the behavior of all other browsers with
+                    //addEventListener support, which fire the onload event for a
+                    //script right after the script execution. See:
+                    //https://connect.microsoft.com/IE/feedback/details/648057/script-onload-event-is-not-fired-immediately-after-script-execution
+                    //UNFORTUNATELY Opera implements attachEvent but does not follow the script
+                    //script execution mode.
+                    if (node.attachEvent &&
+                        //Check if node.attachEvent is artificially added by custom script or
+                        //natively supported by browser
+                        //read https://github.com/requirejs/requirejs/issues/187
+                        //if we can NOT find [native code] then it must NOT natively supported.
+                        //in IE8, node.attachEvent does not have toString()
+                        //Note the test for "[native code" with no closing brace, see:
+                        //https://github.com/requirejs/requirejs/issues/273
+                        !(node.attachEvent.toString && node.attachEvent.toString().indexOf('[native code') < 0) &&
+                        !isOpera) {
+                        //Probably IE. IE (at least 6-8) do not fire
+                        //script onload right after executing the script, so
+                        //we cannot tie the anonymous define call to a name.
+                        //However, IE reports the script as being in 'interactive'
+                        //readyState at the time of the define call.
 
-                        //Set up load listener. Test attachEvent first because IE9 has
-                        //a subtle issue in its addEventListener and script onload firings
-                        //that do not match the behavior of all other browsers with
-                        //addEventListener support, which fire the onload event for a
-                        //script right after the script execution. See:
-                        //https://connect.microsoft.com/IE/feedback/details/648057/script-onload-event-is-not-fired-immediately-after-script-execution
-                        //UNFORTUNATELY Opera implements attachEvent but does not follow the script
-                        //script execution mode.
-                        if (node.attachEvent &&
-                            //Check if node.attachEvent is artificially added by custom script or
-                            //natively supported by browser
-                            //read https://github.com/requirejs/requirejs/issues/187
-                            //if we can NOT find [native code] then it must NOT natively supported.
-                            //in IE8, node.attachEvent does not have toString()
-                            //Note the test for "[native code" with no closing brace, see:
-                            //https://github.com/requirejs/requirejs/issues/273
-                            !(node.attachEvent.toString && node.attachEvent.toString().indexOf('[native code') < 0) &&
-                            !isOpera) {
-                            //Probably IE. IE (at least 6-8) do not fire
-                            //script onload right after executing the script, so
-                            //we cannot tie the anonymous define call to a name.
-                            //However, IE reports the script as being in 'interactive'
-                            //readyState at the time of the define call.
-
-                            node.attachEvent('onreadystatechange', function () { callback( bower.package( pkgName ).browser.status ) ; }) ;
-                            //It would be great to add an error handler here to catch
-                            //404s in IE9+. However, onreadystatechange will fire before
-                            //the error handler, so that does not help. If addEventListener
-                            //is used, then IE will fire error before load, but we cannot
-                            //use that pathway given the connect.microsoft.com issue
-                            //mentioned above about not doing the 'script execute,
-                            //then fire the script load event listener before execute
-                            //next script' that other browsers do.
-                            //Best hope: IE10 fixes the issues,
-                            //and then destroys all installs of IE 6-9.
-                            //node.attachEvent('onerror', context.onScriptError);
-                        } else {
-                            node.addEventListener('load', function () { callback( bower.package( pkgName ).browser.status ) ; }, false);
-                            node.addEventListener('error', function () { bower.package( pkgName ).browser.status = {error: true, errorFrom: "browser"} ; callback( bower.package( pkgName ).browser.status ) ; }, false);
-                        }
-                    }) ;
+                        node.attachEvent('onreadystatechange', function () { bower.checkCallback( pkgName ) ; }) ;
+                        //It would be great to add an error handler here to catch
+                        //404s in IE9+. However, onreadystatechange will fire before
+                        //the error handler, so that does not help. If addEventListener
+                        //is used, then IE will fire error before load, but we cannot
+                        //use that pathway given the connect.microsoft.com issue
+                        //mentioned above about not doing the 'script execute,
+                        //then fire the script load event listener before execute
+                        //next script' that other browsers do.
+                        //Best hope: IE10 fixes the issues,
+                        //and then destroys all installs of IE 6-9.
+                        //node.attachEvent('onerror', context.onScriptError);
+                    } else {
+                        node.addEventListener('load', function () { bower.checkCallback( pkgName ) ; }, false);
+                        node.addEventListener('error', function () { bower.package( pkgName ).browser.status = {error: true, errorFrom: "browser"} ; bower.checkCallback( pkgName ) ; }, false);
+                    }
                 }
                 
                 bower.packagesTree.forEach( function (pkg) {
@@ -441,7 +463,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                                 loaderTag.type = getTag.type ;
                                 loaderTag.async = pkg.browser.async ;
                                 
-                                /* with time, for other script support,paid attention to `load` event issue for some file by browsers.
+                                /* with time, for other script support, paid attention to `load` event issue for some file by browsers.
                                  * look at comments below for `link` tag hack for more details.
                                 */
                                 if (bower.callbacks[ pkg.name ]) attachPkgCallback( loaderTag, pkg.name ) ;
@@ -515,28 +537,7 @@ bower.import = function (pkgName, callback) {
             
             if (!bower.callbacks[ pkgName ]) bower.callbacks[ pkgName ] = [] ;
             
-            bower.callbacks[ pkgName ].push( function (status) {
-                
-                if (status.errorFrom === "bowerder") {
-                    //the package wasn't added to the packages's configuration registry
-                    callback( status ) ;
-                }
-                else {
-                    /* the hack here is to be sure that all associated main files of considered package are loaded in the browser.
-                     * this is checked with a counter which content the number of main files that was loaded (event if the loading fail with browser loading process).
-                     * therefore the package is fully imported when the counter is equal to total of the package's main files.
-                     * callback is executed only if the package is fully imported.
-                    */
-                    if (!bower.package( pkgName ).browser.loaded) bower.package( pkgName ).browser.counter++ ;
-
-                    if (bower.package( pkgName ).browser.counter === bower.package( pkgName ).main.length) {
-
-                        bower.package( pkgName ).browser.loaded = true ; 
-
-                        callback( status ) ;
-                    }
-                }
-            } ) ;
+            bower.callbacks[ pkgName ].push( callback ) ;
             
             /* with current import's process, callback which is added to the callbacks's registry have the last index 
              * that index is keeped and will be use to access to that callback if necessary in certains conditions
