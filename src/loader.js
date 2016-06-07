@@ -25,30 +25,34 @@ if (typeof bower !== "undefined") {
  * dependencies will always be imported before package of which depends ; this influences how order is done in packages's configuration registry.
  * package have to have a unique occurrence on the registry ; this assure that we will not have duplicate component's import.
  * 
- * with each import instruction can be associate a callback function.
+ * with each import instruction, can be associated a callback function.
  * considered callback is executed when associated package's importation is fully done.
  * package's importation is fully done when all it main files are loaded *in the DOM*.
  * a callback take an object as argument with the following properties:
- * `error` a boolean which inform if the associated package's importation was fully done or not ;
- * `errorFrom` a string which inform about the place where the error occure, possible value are "browser" or "bowerder" ;
+ * `error` : a boolean which inform if the associated package's importation was fully done or not ;
+ * `errorFrom` : a string which inform about the place where the error occure, possible value are "browser" or "bowerder" ;
  *    if the value is "bowerder" it's maybe an internal/connection error when loading package configuration (bower.json),
  *    if the value is "browser" it's maybe a 404/connection error on loading main files *in the DOM* ;
  *    therefore, console is the place to see what really happen.
  * that object is usefull to check if there isn't an error (conditions are good) for some instructions.
- * in case of contionnal or timed importation, if a package is already fully imported or have already adress a full loading process, the associated callback will be immediatly executed.
- * this is to introduce the fact many callbacks can be associated to a package's importation via multiple `import's` instructions.
+ * in case of contionnal or timed importation, if a package is already fully imported or have already adressed a full loading process, the associated callback will be immediatly executed.
+ * this is to introduce the fact that many callbacks can be associated to a package's importation via multiple `import's` instructions.
  * that said there will be a registry where we can acces to any package's associated callbacks, via the package's name.
  * 
  * to better manage some stuff, the loader can set extras porperties throught the `browser` object, which will be itself a property of the package's configuration object. 
  * for some globals tasks, global callbacks can be managed throught the special bowerder "reserved" package's named `#bowerder`.
+ * global callback take an object as argument with the following properties:
+ * `error` : a boolean which inform if all package's importation was fully done or not ;
+ * `errorBrowser` : an array which inform about packages where error occure and if it was from "browser" loading operations ;
+ * `errorBowerder` : an array which inform about packages where error occure and if it was from "bowerder" loading operations ;
+ *    therefore, console is the place to see what really happen.
 */
 
 bower.dir = "../.." ;      //bower base directory
-bower.pkgCount = 0 ;       //number of package that have been loaded
 bower.loadingCount = 0 ;   //number of package that are in loading process
 bower.total = 0 ;          //total number of packages that must to be loaded
 bower.callbacks = {} ;     //packages's callback functions registry 
-bower.packagesTree = [] ;  //packages's configuration registry, init with the bowerder "reserved" package's
+bower.packagesTree = [] ;  //packages's configuration registry
 
 bower.browser = {          // these properties will help in some case for bowerder global processing.
     loaded: false ,
@@ -434,9 +438,9 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                     pkgConfig.browser.counter = 0 ;
 
                     /* if `pkgCaller` is set, then current loading package adress by `pkgName` is a dependency.
-                 * therefore, it have to be added before the `pkgCaller` in the packages's configuration registry.
-                 * else it's a just a package to add in the considered registry.
-                */
+                     * therefore, it have to be added before the `pkgCaller` in the packages's configuration registry.
+                     * else it's just a package to add in the considered registry.
+                    */
                     if (pkgCaller) {
 
                         //mark package to be synchronously loaded and executed
@@ -515,8 +519,8 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
 
                         isAlreadyLoaded = false ;
                         /* before include a loader tag in the DOM, it's primordial to check if the associated file isn't already loaded in.
-                     * this assure to have an unique instance of a package in the DOM include by our `bower loader`.
-                    */
+                         * this assure to have an unique instance of a package in the DOM include by our `bower loader`.
+                        */
                         if (document.querySelector) {
                             //efficient : this is for all major browsers and IE>8
                             if (document.head.querySelector('[data-bowerpkg ="'+pkg.name+'"]')) isAlreadyLoaded = true ;
