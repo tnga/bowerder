@@ -39,15 +39,23 @@ if (typeof bower !== "undefined") {
  * this is to introduce the fact many callbacks can be associated to a package's importation via multiple `import's` instructions.
  * that said there will be a registry where we can acces to any package's associated callbacks, via the package's name.
  * 
- * to better manage some stuff, the loader can set extras porperties throught the `browser` object, which will be itself a property of the package's configuration object.   
+ * to better manage some stuff, the loader can set extras porperties throught the `browser` object, which will be itself a property of the package's configuration object. 
+ * for some globals tasks, global callbacks can be managed throught the special bowerder "reserved" package's named `#bowerder`.
 */
 
 bower.dir = "../.." ;      //bower base directory
 bower.pkgCount = 0 ;       //number of package that have been loaded
-bower.loadingCount = 0 ;   //have many package are in loading process
+bower.loadingCount = 0 ;   //number of package that are in loading process
 bower.total = 0 ;          //total number of packages that must to be loaded
 bower.callbacks = {} ;     //packages's callback functions registry 
-bower.packagesTree = [] ;  //packages's configuration registry 
+bower.packagesTree = [] ;  //packages's configuration registry, init with the bowerder "reserved" package's
+
+bower.browser = {          // these properties will help in some case for bowerder global processing.
+    loaded: false ,
+    waitingCB: [], //index of callbacks's to be execute after full packages's importation "in the DOM" 
+    status: {error: "false", fromBrowser: [], fromBowerder: []}
+} ;
+
 
 /**
  * get the text reponse throught an ajax request from a given path
@@ -169,20 +177,136 @@ bower.package = function (pkgName) {
 bower.checkCallback = function (pkgName) {
     
     /* the hack here is to be sure that all associated main files of considered package are loaded in the browser.
-         * this is checked with a counter which content the number of main files that was loaded (event if the loading fail with browser loading process).
-         * therefore the package is fully imported when the counter is equal to total of the package's main files.
-         * callback is executed only if the package is fully imported.
-        */
+     * this is checked with a counter which content the number of main files that was loaded (event if the loading fail with browser loading process).
+     * therefore the package is fully imported when the counter is equal to total of the package's main files.
+     * callback is executed only if the package is fully imported.
+    */
     if (!bower.package( pkgName ).browser.loaded) bower.package( pkgName ).browser.counter++ ;
 
     if (bower.package( pkgName ).browser.counter === bower.package( pkgName ).main.length) {
 
         bower.package( pkgName ).browser.loaded = true ; 
+        
+        if (bower.callbacks[ pkgName ]) {
+            
+            bower.callbacks[ pkgName ].forEach( function (callback) {
 
-        bower.callbacks[ pkgName ].forEach( function (callback) {
+                callback( bower.package( pkgName ).browser.status ) ;
+            });
+        }
+        
+        //will check if all packages are fully imported for global callbacks's executions
+        bower.ready() ; 
+    }
+}
 
-            callback( bower.package( pkgName ).browser.status ) ;
-        });
+/**
+ * usefull to run callbacks after full packages's importation "in the DOM".
+ * @param {function} callback function to execute. If empty, the function will try to run waiting callbacks.
+ */
+bower.ready = function (callback) {
+ 
+    if (callback) {
+
+        if (typeof callback !== "function" && !(callback instanceof Function)) {
+
+            console.warn("bowerder:ready: argument must be a function" ) ;
+        }
+        else {
+
+            if (!bower.callbacks["#bowerder"]) bower.callbacks["#bowerder"] = [] ;
+
+            bower.callbacks["#bowerder"].push( callback ) ;
+
+            /* with current ready's process, callback which is added to the callbacks's registry have the last index for the associated package,
+             * that index is keeped and will be use to access to that callback if necessary in certains conditions
+            */
+            bower.browser.waitingCB.push( bower.callbacks["#bowerder"].length - 1 )  ;
+        }
+    }
+    
+    if (bower.packagesTree.length > 0) bower.browser.loaded = true ;
+    
+    for (var i=0; i<bower.packagesTree.length; i++) {
+        
+        if (!bower.packagesTree[i].browser.loaded) {
+            
+            bower.browser.loaded = false ;
+            break ;
+        }
+    }
+    
+    if (bower.browser.loaded) {
+        
+        bower.browser.waitingCB.forEach( function (cbIndex) {
+            
+            bower.callbacks["#bowerder"][cbIndex]( bower.browser.status ) ;
+        }) ;
+    }
+};
+
+/**
+ * attach considered package's callbacks to it main files browser `load` event
+ * @param   {Element}  node    element to attach callbacks on it `load` event
+ * @param   {string}   pkgName package's name to use associated callbacks
+*/
+bower.attachPackageCB = function (node, pkgName) {
+
+    if (!(node instanceof Element)) {
+
+        console.warn("bowerder:attachPackageCB: argument must be an Element");
+        return null ;
+    }
+
+    //Set up load listener. Test attachEvent first because IE9 has
+    //a subtle issue in its addEventListener and script onload firings
+    //that do not match the behavior of all other browsers with
+    //addEventListener support, which fire the onload event for a
+    //script right after the script execution. See:
+    //https://connect.microsoft.com/IE/feedback/details/648057/script-onload-event-is-not-fired-immediately-after-script-execution
+    //UNFORTUNATELY Opera implements attachEvent but does not follow the script
+    //script execution mode.
+    if (node.attachEvent &&
+        //Check if node.attachEvent is artificially added by custom script or
+        //natively supported by browser
+        //read https://github.com/requirejs/requirejs/issues/187
+        //if we can NOT find [native code] then it must NOT natively supported.
+        //in IE8, node.attachEvent does not have toString()
+        //Note the test for "[native code" with no closing brace, see:
+        //https://github.com/requirejs/requirejs/issues/273
+        !(node.attachEvent.toString && node.attachEvent.toString().indexOf('[native code') < 0) &&
+        !isOpera) {
+        //Probably IE. IE (at least 6-8) do not fire
+        //script onload right after executing the script, so
+        //we cannot tie the anonymous define call to a name.
+        //However, IE reports the script as being in 'interactive'
+        //readyState at the time of the define call.
+
+        node.attachEvent('onreadystatechange', function () { bower.checkCallback( pkgName ) ; }) ;
+        //It would be great to add an error handler here to catch
+        //404s in IE9+. However, onreadystatechange will fire before
+        //the error handler, so that does not help. If addEventListener
+        //is used, then IE will fire error before load, but we cannot
+        //use that pathway given the connect.microsoft.com issue
+        //mentioned above about not doing the 'script execute,
+        //then fire the script load event listener before execute
+        //next script' that other browsers do.
+        //Best hope: IE10 fixes the issues,
+        //and then destroys all installs of IE 6-9.
+        //node.attachEvent('onerror', context.onScriptError);
+    } else {
+        
+        node.addEventListener('load', function () { bower.checkCallback( pkgName ) ; }, false);
+        node.addEventListener('error', function () { 
+
+                bower.package( pkgName ).browser.status = {error: true, errorFrom: "browser"} ;
+                bower.browser.status.error = true ;
+                bower.browser.status.fromBrowser.push( pkgName ) ;
+
+                bower.checkCallback( pkgName ) ; 
+            },
+            false 
+        );
     }
 }
 
@@ -268,12 +392,12 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
     if (!isAlreadyOk) { //process the adding operation to the registry.
         
         bower.loadingCount++ ;
+        bower.total++ ;
         
         bower.xhrGet( bower.dir +"/"+ pkgName +"/bower.json", true, function (reponse) {
             
             if (reponse.error) {
                 
-                bower.loadingCount-- ;
                 console.error("bowerder:addPackage: unable to load `"+ pkgName +"` component." );
                 
                 /* considering that the package will not be imported and
@@ -285,234 +409,194 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                     bower.callbacks[ pkgName ][cbIndex]( {error: true, errorFrom: "bowerder"} ) ;
                 } 
                 
-                return null ;
+                bower.browser.status.error = true ;
+                bower.browser.status.fromBowerder.push( pkgName ) ;                
             }
-            
-            var pkgConfig = JSON.parse( reponse.text ) ; 
-            
-            if (pkgConfig instanceof Object) {
+            else {
                 
-                delete pkgConfig['ignore'] ;
-                delete pkgConfig['keywords'] ;
-                delete pkgConfig['moduleType'] ;
-                delete pkgConfig['resolutions'] ;
-                
-                if (!(pkgConfig.browser instanceof Object)) pkgConfig.browser = {} ;
-                //by default,load and execute script asynchronously
-                pkgConfig.browser.async = true ;
-                //by default, files to load from the package aren't yet imported
-                pkgConfig.browser.loaded = false ;
-                //by default, set importation status to done without error  
-                pkgConfig.browser.status = {error: false, errorFrom: undefined} ;
-                //init the number of imported file counter for the package
-                pkgConfig.browser.counter = 0 ;
-                
-                /* if `pkgCaller` is set, then current loading package adress by `pkgName` is a dependency.
+                var pkgConfig = JSON.parse( reponse.text ) ; 
+
+                if (pkgConfig instanceof Object) {
+
+                    delete pkgConfig['ignore'] ;
+                    delete pkgConfig['keywords'] ;
+                    delete pkgConfig['moduleType'] ;
+                    delete pkgConfig['resolutions'] ;
+
+                    if (!(pkgConfig.browser instanceof Object)) pkgConfig.browser = {} ;
+                    //by default,load and execute script asynchronously
+                    pkgConfig.browser.async = true ;
+                    //by default, files to load from the package aren't yet imported
+                    pkgConfig.browser.loaded = false ;
+                    //by default, set importation status to done without error  
+                    pkgConfig.browser.status = {error: false, errorFrom: undefined} ;
+                    //init the number of imported file counter for the package
+                    pkgConfig.browser.counter = 0 ;
+
+                    /* if `pkgCaller` is set, then current loading package adress by `pkgName` is a dependency.
                  * therefore, it have to be added before the `pkgCaller` in the packages's configuration registry.
                  * else it's a just a package to add in the considered registry.
                 */
-                if (pkgCaller) {
-                    
-                    //mark package to be synchronously loaded and executed
-                    pkgConfig.browser.async = false ;
-                    bower.packagesTree[ bower.packageIndex( pkgCaller ) ].browser.async = false ;
-                    
-                    if (bower.packageIndex( pkgCaller ) != -1) {
+                    if (pkgCaller) {
 
-                        bower.packagesTree.splice( bower.packageIndex( pkgCaller ), 0, pkgConfig) ;
+                        //mark package to be synchronously loaded and executed
+                        pkgConfig.browser.async = false ;
+                        bower.package( pkgCaller ).browser.async = false ;
+
+                        if (bower.packageIndex( pkgCaller ) != -1) {
+
+                            bower.packagesTree.splice( bower.packageIndex( pkgCaller ), 0, pkgConfig) ;
+                        }
+                    }
+                    else {
+
+                        bower.packagesTree.push( pkgConfig ) ;
+                    }
+
+                    //if the current loading package have dependencies, then also process their loading
+                    if (pkgConfig["dependencies"]) {
+
+                        var pkgDeps = Object.getOwnPropertyNames( pkgConfig["dependencies"] );
+
+                        pkgDeps.forEach( function (name) {
+
+                            bower.addPackage( name, pkgConfig["name"]) ;
+                        }) ;
                     }
                 }
                 else {
-                    
-                    bower.packagesTree.push( pkgConfig ) ;
+
+                    console.warn("bowerder:addPackage: unable to load `"+ pkgName +"` component." );
                 }
-
-                //if the current loading package have dependencies, then also process their loading
-                if (pkgConfig["dependencies"]) {
-                    
-                    var pkgDeps = Object.getOwnPropertyNames( pkgConfig["dependencies"] );
-
-                    pkgDeps.forEach( function (name) {
-
-                        bower.addPackage( name, pkgConfig["name"]) ;
-                    }) ;
-                }
-            }
-            else {
-
-                console.warn("bowerder:addPackage: unable to load `"+ pkgName +"` component." );
-            }
+            } 
             
             bower.loadingCount-- ;
             
             //when all the loading package process are finished, process their importation on the DOM.
             if (bower.loadingCount === 0) {
                 
-                //be sure to have unique package occurence in package's tree
-                for (var i=0; i < bower.packagesTree.length; i++) {
+                /* if all loading package's configuration process have failed, 
+                 * directly run globals callbacks (if they are).
+                 * this, considering the fact that error can be check from callback by using the `status` argument.
+                */
+                if (bower.packagesTree.length === 0) {
+
+                    bower.browser.loaded = true ;
+                    bower.ready() ;
+                }
+                else {
                     
-                    for (var j=i+1; j < bower.packagesTree.length; j++) {
-                    
-                        if (bower.packagesTree[i].name === bower.packagesTree[j].name) {
-                            
-                            bower.packagesTree.splice( j, 1) ;
-                            j-- ;
+                    //be sure to have unique package occurence in package's tree
+                    for (var i=0; i < bower.packagesTree.length; i++) {
+
+                        for (var j=i+1; j < bower.packagesTree.length; j++) {
+
+                            if (bower.packagesTree[i].name === bower.packagesTree[j].name) {
+
+                                bower.packagesTree.splice( j, 1) ;
+                                bower.total-- ;
+                                
+                                j-- ;
+                            }
                         }
                     }
-                }
-                
-                var pkgScriptTags = [] ,
-                    pkgLinkTags = [] ,
-                    isAlreadyLoaded = false ,
-                    //Oh the tragedy, detecting opera. See the usage of isOpera for reason.
-                    isOpera = typeof opera !== 'undefined' && opera.toString() === '[object Opera]',
-                    loaderTag = undefined ,
-                    getTag = undefined ; //supported tag
-                
-                /**
-                 * attach considered package's callbacks to it main files browser `load` event
-                 * @param   {Element}  node    element to attach callbacks on it `load` event
-                 * @param   {string}   pkgName package's name to use associated callbacks
-                 */
-                function attachPkgCallback (node, pkgName) {
-                    
-                    if (!(node instanceof Element)) {
-                        
-                        console.warn("bowerder: argument must be an Element");
-                        return null ;
-                    }
-                    
-                    //Set up load listener. Test attachEvent first because IE9 has
-                    //a subtle issue in its addEventListener and script onload firings
-                    //that do not match the behavior of all other browsers with
-                    //addEventListener support, which fire the onload event for a
-                    //script right after the script execution. See:
-                    //https://connect.microsoft.com/IE/feedback/details/648057/script-onload-event-is-not-fired-immediately-after-script-execution
-                    //UNFORTUNATELY Opera implements attachEvent but does not follow the script
-                    //script execution mode.
-                    if (node.attachEvent &&
-                        //Check if node.attachEvent is artificially added by custom script or
-                        //natively supported by browser
-                        //read https://github.com/requirejs/requirejs/issues/187
-                        //if we can NOT find [native code] then it must NOT natively supported.
-                        //in IE8, node.attachEvent does not have toString()
-                        //Note the test for "[native code" with no closing brace, see:
-                        //https://github.com/requirejs/requirejs/issues/273
-                        !(node.attachEvent.toString && node.attachEvent.toString().indexOf('[native code') < 0) &&
-                        !isOpera) {
-                        //Probably IE. IE (at least 6-8) do not fire
-                        //script onload right after executing the script, so
-                        //we cannot tie the anonymous define call to a name.
-                        //However, IE reports the script as being in 'interactive'
-                        //readyState at the time of the define call.
 
-                        node.attachEvent('onreadystatechange', function () { bower.checkCallback( pkgName ) ; }) ;
-                        //It would be great to add an error handler here to catch
-                        //404s in IE9+. However, onreadystatechange will fire before
-                        //the error handler, so that does not help. If addEventListener
-                        //is used, then IE will fire error before load, but we cannot
-                        //use that pathway given the connect.microsoft.com issue
-                        //mentioned above about not doing the 'script execute,
-                        //then fire the script load event listener before execute
-                        //next script' that other browsers do.
-                        //Best hope: IE10 fixes the issues,
-                        //and then destroys all installs of IE 6-9.
-                        //node.attachEvent('onerror', context.onScriptError);
-                    } else {
-                        node.addEventListener('load', function () { bower.checkCallback( pkgName ) ; }, false);
-                        node.addEventListener('error', function () { bower.package( pkgName ).browser.status = {error: true, errorFrom: "browser"} ; bower.checkCallback( pkgName ) ; }, false);
-                    }
-                }
-                
-                bower.packagesTree.forEach( function (pkg) {
-                    
-                    if (typeof pkg.main === "string") pkg.main = [pkg.main] ;
-                    
-                    isAlreadyLoaded = false ;
-                    /* before include a loader tag in the DOM, it's primordial to check if the associated file isn't already loaded in.
+                    var pkgScriptTags = [] ,
+                        pkgLinkTags = [] ,
+                        isAlreadyLoaded = false ,
+                        //Oh the tragedy, detecting opera. See the usage of isOpera for reason.
+                        isOpera = typeof opera !== 'undefined' && opera.toString() === '[object Opera]',
+                        loaderTag = undefined ,
+                        getTag = undefined ; //supported tag
+
+                    bower.packagesTree.forEach( function (pkg) {
+
+                        if (typeof pkg.main === "string") pkg.main = [pkg.main] ;
+
+                        isAlreadyLoaded = false ;
+                        /* before include a loader tag in the DOM, it's primordial to check if the associated file isn't already loaded in.
                      * this assure to have an unique instance of a package in the DOM include by our `bower loader`.
                     */
-                    if (document.querySelector) {
-                        //efficient : this is for all major browsers and IE>8
-                        if (document.head.querySelector('[data-bowerpkg ="'+pkg.name+'"]')) isAlreadyLoaded = true ;
-                    }
-                    else { //alternative with more hack : this is specialy for IE<=8
-                                                
-                        var domLoaderTags = [].slice.call( document.head.getElementsByTagName("link") ) ;
+                        if (document.querySelector) {
+                            //efficient : this is for all major browsers and IE>8
+                            if (document.head.querySelector('[data-bowerpkg ="'+pkg.name+'"]')) isAlreadyLoaded = true ;
+                        }
+                        else { //alternative with more hack : this is specialy for IE<=8
+
+                            var domLoaderTags = [].slice.call( document.head.getElementsByTagName("link") ) ;
                             domLoaderTags = domLoaderTags.concat( [].slice.call( document.head.getElementsByTagName("scrpit") ) ) ;
-                        for (var j=0; j < domLoaderTags.length; j++) {
+                            for (var j=0; j < domLoaderTags.length; j++) {
 
-                            if (domLoaderTags[j].getAttribute("data-bowerpkg") === pkg.name ) {
+                                if (domLoaderTags[j].getAttribute("data-bowerpkg") === pkg.name ) {
 
-                                isAlreadyLoaded = true ;
-                                break ;
+                                    isAlreadyLoaded = true ;
+                                    break ;
+                                }
                             }
                         }
-                    }
-                    
-                    if (!isAlreadyLoaded) {
-                        
-                        for (index in pkg.main) {
 
-                            getTag = bower.parseTagType( pkg.main[index] ) ;
+                        if (!isAlreadyLoaded) {
 
-                            if (getTag.name === "script") { 
+                            for (index in pkg.main) {
 
-                                loaderTag = document.createElement("script") ;
-                                loaderTag.setAttribute("data-bowerpkg", pkg.name) ;
-                                loaderTag.type = getTag.type ;
-                                loaderTag.async = pkg.browser.async ;
-                                
-                                /* with time, for other script support, paid attention to `load` event issue for some file by browsers.
-                                 * look at comments below for `link` tag hack for more details.
-                                */
-                                if (bower.callbacks[ pkg.name ]) attachPkgCallback( loaderTag, pkg.name ) ;
-                                
-                                loaderTag.src = bower.dir +"/"+ pkg.name +"/"+ pkg.main[index] ;
+                                getTag = bower.parseTagType( pkg.main[index] ) ;
 
-                                pkgScriptTags.push( loaderTag ) ;
-                            }
-                            if (getTag.name === "link") {
+                                if (getTag.name === "script") { 
 
-                                loaderTag = document.createElement("link") ;
-                                loaderTag.setAttribute("data-bowerpkg", pkg.name) ;
-                                loaderTag.rel = getTag.rel ;
-                                loaderTag.type = getTag.type ;
-                                
-                                if (bower.callbacks[ pkg.name ]) {
-                                    
+                                    loaderTag = document.createElement("script") ;
+                                    loaderTag.setAttribute("data-bowerpkg", pkg.name) ;
+                                    loaderTag.type = getTag.type ;
+                                    loaderTag.async = pkg.browser.async ;
+
+                                    /* with time, for other script support, paid attention to `load` event issue for some file by browsers.
+                                     * look at comments below for `link` tag hack for more details.
+                                    */
+                                    bower.attachPackageCB( loaderTag, pkg.name ) ;
+
+                                    loaderTag.src = bower.dir +"/"+ pkg.name +"/"+ pkg.main[index] ;
+
+                                    pkgScriptTags.push( loaderTag ) ;
+                                }
+                                if (getTag.name === "link") {
+
+                                    loaderTag = document.createElement("link") ;
+                                    loaderTag.setAttribute("data-bowerpkg", pkg.name) ;
+                                    loaderTag.rel = getTag.rel ;
+                                    loaderTag.type = getTag.type ;
+
                                     /* browsers (as tested on firefox and chrome) seems to not execute event listeners 
                                      * attached to `load` envent of some file (exception for css).
-                                     * unless will find hack to resolve that, considered files will be ignored for callback assignements.
+                                     * unless will find hack to resolve that, callbacks assignement will be directly checked
+                                     * before considered files will have their path set to be included to the DOM.
                                     */
                                     if (getTag.fext !== "css") {
-                                        
-                                        console.warn("bowerder: can't attach callback to `onload` event of "+ pkg.main[index] +" for "+ pkg.name) ;
-                                        bower.package( pkg.name ).browser.counter++ ;
+
+                                        console.warn("bowerder: can't attach callback to `onload` event of "+ pkg.name +"/"+ pkg.main[index]) ;
+                                        bower.checkCallback( pkg.name ) ;
                                     }
-                                    else attachPkgCallback( loaderTag, pkg.name ) ;
-                                }
-                                
-                                loaderTag.href = bower.dir +"/"+ pkg.name +"/"+ pkg.main[index] ;
+                                    else bower.attachPackageCB( loaderTag, pkg.name ) ;
 
-                                pkgLinkTags.push( loaderTag ) ;
-                            }  
-                            if (getTag.name === "unknow") {
+                                    loaderTag.href = bower.dir +"/"+ pkg.name +"/"+ pkg.main[index] ;
 
-                                //console.warn("bowerder: unable to load unsupported file: "+ bower.dir +"/"+ pkg.name +"/"+ pkg.main[index]) ;
-                                //count the file for loading's fetching state 
-                                bower.package( pkg.name ).browser.counter++ ;
-                            }                       
+                                    pkgLinkTags.push( loaderTag ) ;
+                                }  
+                                if (getTag.name === "unknow") {
+
+                                    //console.warn("bowerder: unable to load unsupported file: "+ bower.dir +"/"+ pkg.name +"/"+ pkg.main[index]) ;
+                                    //count the file for loading's fetching state 
+                                    bower.package( pkg.name ).browser.counter++ ;
+                                }                       
+                            }
                         }
-                    }
-                }) ;
-                
-                pkgLinkTags.concat( pkgScriptTags ).forEach( function(loaderTag) {
-                    
-                    document.head.appendChild( loaderTag ) ;
-                }) ;
-                
-                console.log( bower.packagesTree ) ;
+                    }) ;
+
+                    pkgLinkTags.concat( pkgScriptTags ).forEach( function(loaderTag) {
+
+                        document.head.appendChild( loaderTag ) ;
+                    }) ;
+
+                    console.log( bower.packagesTree ) ;
+                }
             }
         }) ;
     }
@@ -531,7 +615,7 @@ bower.import = function (pkgName, callback) {
 
         if (typeof callback !== "function" && !(callback instanceof Function)) {
 
-            console.warn("bowerder:import: argument must be a string" ) ;
+            console.warn("bowerder:import: argument must be a function" ) ;
         }
         else {
             
@@ -546,5 +630,5 @@ bower.import = function (pkgName, callback) {
         }
     }
     else  bower.addPackage( pkgName ) ;
-    
+
 };
