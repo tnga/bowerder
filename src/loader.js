@@ -39,13 +39,14 @@ if (typeof bower !== "undefined") {
  * this is to introduce the fact that many callbacks can be associated to a package's importation via multiple `import's` instructions.
  * that said there will be a registry where we can acces to any package's associated callbacks, via the package's name.
  * 
- * to better manage some stuff, the loader can set extras porperties throught the `browser` object, which will be itself a property of the package's configuration object. 
  * for some globals tasks, global callbacks can be managed throught the special bowerder "reserved" package's named `#bowerder`.
  * global callback take an object as argument with the following properties:
  * `error` : a boolean which inform if all package's importation was fully done or not ;
  * `errorBrowser` : an array which inform about packages where error occure and if it was from "browser" loading operations ;
  * `errorBowerder` : an array which inform about packages where error occure and if it was from "bowerder" loading operations ;
  *    therefore, console is the place to see what really happen.
+ *    
+ * to better manage some stuff, the loader can set extras porperties throught the `browser` object, which will be itself a property of the package's configuration object. 
 */
 
 bower.dir = "../.." ;      //bower base directory
@@ -187,7 +188,7 @@ bower.checkCallback = function (pkgName) {
     */
     if (!bower.package( pkgName ).browser.loaded) bower.package( pkgName ).browser.counter++ ;
 
-    if (bower.package( pkgName ).browser.counter === bower.package( pkgName ).main.length) {
+    if (bower.package( pkgName ).browser.counter === bower.package( pkgName ).browser.main.length) {
 
         bower.package( pkgName ).browser.loaded = true ; 
         
@@ -436,6 +437,33 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                     pkgConfig.browser.status = {error: false, errorFrom: undefined} ;
                     //init the number of imported file counter for the package
                     pkgConfig.browser.counter = 0 ;
+                    
+                    /* minification is a way for developper to have for some files a better loading optimization. 
+                     * however, `bower.json` spec do not allow to use minified files as mains files for a component.
+                     * developers use to set associated `main` property with sources or developments files.
+                     * considering how web projects are now build, that pratice isn't advantageous for browsers.
+                     * indeed, set an `index.scss` or an unminified `index.js` file as main file isn't good for browsers to digest.
+                     * that why is now recommended to also set a `browser: {main: []}` properties for mains files that browsers can easly digest.
+                     * minified files with sourcemaps are specialy welcome in that case.
+                     * bowerder will use that properties to load component *in the DOM*; if they aren't set, it will use the `main` property. 
+                     * here is an example illustration for bowerder to well do it job:
+                     * //bower.json
+                     *    main: ["dist/index.scss", "dist/index.coffee"], //keep bower json spec
+                     *    browser: {
+                     *       main: ["dist/index.min.css", "dist/index.min.js"] //for browsers throught bowerder
+                     *    }
+                     *    ... //others properties
+                    */
+                    if (!pkgConfig.browser.main) {
+                        
+                        if (!pkgConfig.main) {
+                            
+                            console.warn("bowerder:addPackage: there isn't main files indication for "+ pkgName) ;
+                            pkgConfig.main = [] ;
+                        }
+                        
+                        pkgConfig.browser.main = (typeof pkgConfig.main === "string") ? [pkgConfig.main] : pkgConfig.main ;
+                    }
 
                     /* if `pkgCaller` is set, then current loading package adress by `pkgName` is a dependency.
                      * therefore, it have to be added before the `pkgCaller` in the packages's configuration registry.
@@ -515,8 +543,6 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
 
                     bower.packagesTree.forEach( function (pkg) {
 
-                        if (typeof pkg.main === "string") pkg.main = [pkg.main] ;
-
                         isAlreadyLoaded = false ;
                         /* before include a loader tag in the DOM, it's primordial to check if the associated file isn't already loaded in.
                          * this assure to have an unique instance of a package in the DOM include by our `bower loader`.
@@ -541,9 +567,9 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
 
                         if (!isAlreadyLoaded) {
 
-                            for (index in pkg.main) {
+                            for (index in pkg.browser.main) {
 
-                                getTag = bower.parseTagType( pkg.main[index] ) ;
+                                getTag = bower.parseTagType( pkg.browser.main[ index ] ) ;
 
                                 if (getTag.name === "script") { 
 
@@ -557,7 +583,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                                     */
                                     bower.attachPackageCB( loaderTag, pkg.name ) ;
 
-                                    loaderTag.src = bower.dir +"/"+ pkg.name +"/"+ pkg.main[index] ;
+                                    loaderTag.src = bower.dir +"/"+ pkg.name +"/"+ pkg.browser.main[ index ] ;
 
                                     pkgScriptTags.push( loaderTag ) ;
                                 }
@@ -575,18 +601,18 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                                     */
                                     if (getTag.fext !== "css") {
 
-                                        console.warn("bowerder: can't attach callback to `onload` event of "+ pkg.name +"/"+ pkg.main[index]) ;
+                                        console.warn("bowerder: can't attach callback to `onload` event of "+ pkg.name +"/"+ pkg.browser.main[ index ]) ;
                                         bower.checkCallback( pkg.name ) ;
                                     }
                                     else bower.attachPackageCB( loaderTag, pkg.name ) ;
 
-                                    loaderTag.href = bower.dir +"/"+ pkg.name +"/"+ pkg.main[index] ;
+                                    loaderTag.href = bower.dir +"/"+ pkg.name +"/"+ pkg.browser.main[ index ] ;
 
                                     pkgLinkTags.push( loaderTag ) ;
                                 }  
                                 if (getTag.name === "unknow") {
 
-                                    //console.warn("bowerder: unable to load unsupported file: "+ bower.dir +"/"+ pkg.name +"/"+ pkg.main[index]) ;
+                                    //console.warn("bowerder: unable to load unsupported file: "+ bower.dir +"/"+ pkg.name +"/"+ pkg.browser.main[ index ]) ;
                                     //count the file for loading's fetching state 
                                     bower.package( pkg.name ).browser.counter++ ;
                                 }                       
