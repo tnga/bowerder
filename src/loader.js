@@ -39,14 +39,14 @@ if (typeof bower !== "undefined") {
  * this is to introduce the fact that many callbacks can be associated to a package's importation via multiple `import's` instructions.
  * that said there will be a registry where we can acces to any package's associated callbacks, via the package's name.
  * 
- * for some globals tasks, global callbacks can be managed throught the special bowerder "reserved" package's named `#bowerder`.
+ * for some globals tasks, global callbacks can be managed through the special bowerder "reserved" package's named `#bowerder`.
  * global callback take an object as argument with the following properties:
  * `error` : a boolean which inform if all package's importation was fully done or not ;
  * `errorBrowser` : an array which inform about packages where error occure and if it was from "browser" loading operations ;
  * `errorBowerder` : an array which inform about packages where error occure and if it was from "bowerder" loading operations ;
  *    therefore, console is the place to see what really happen.
  *    
- * to better manage some stuff, the loader can set extras porperties throught the `browser` object, which will be itself a property of the package's configuration object. 
+ * to better manage some stuff, the loader can set extras porperties through the `browser` object, which will be itself a property of the package's configuration object. 
 */
 
 bower.dir = "../.." ;      //bower base directory
@@ -63,7 +63,7 @@ bower.browser = {          // these properties will help in some case for bowerd
 
 
 /**
- * get the text reponse throught an ajax request from a given path
+ * get the text reponse through an ajax request from a given path
  * @param   {string}   path     path where to get file's content
  * @param   {boolean}  isAsync  enable request asynchrone or not
  * @param   {function} callback the function to execute after the end of request process. take the returned object as argument 
@@ -450,7 +450,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                      * //bower.json
                      *    main: ["dist/index.scss", "dist/index.coffee"], //keep bower json spec
                      *    browser: {
-                     *       main: ["dist/index.min.css", "dist/index.min.js"] //for browsers throught bowerder
+                     *       main: ["dist/index.min.css", "dist/index.min.js"] //for browsers through bowerder
                      *    }
                      *    ... //others properties
                     */
