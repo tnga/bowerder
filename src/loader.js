@@ -8,13 +8,13 @@
 */
 
 //manage possible conflict with loader namespace definition.
-if (typeof bower !== "undefined") {
+if (typeof bower !== "undefined" && !(bower.components instanceof Object)) {
 
     console.warn("Seem like `bower` namespace is use for another purpose. Taking risk of an overwrite ...") ;
     window.bower = bower = {} ;
     console.warn("Forcing `bower` namespace initialization ... done.") ;
 
-} else {
+} else if (typeof bower === "undefined") {
 
     window.bower = {} ;
 }
