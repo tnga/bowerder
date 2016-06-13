@@ -24,6 +24,12 @@ if (typeof bower !== "undefined" && !(bower.components instanceof Object)) {
  * package's configuration is an object build from `bower.json` assciated file.
  * dependencies will always be imported before package of which depends ; this influences how order is done in packages's configuration registry.
  * package have to have a unique occurrence on the registry ; this assure that we will not have duplicate component's import.
+ * that particular registry is the *dependencies package's tree registry*.
+ * there will be also a main registry which is the *local package's registry*, that will content all project's components's configurations installed via bower.
+ * there will be therefore a provided command line tools (`bowerder`) that will help developer to generate the considered *local package's registry* for a target project.
+ * if the loader can't use any associated *local package's registry* to import packages, it will try to use Ajax API to resolve the operation.
+ * bower components directory have to be provided to loader so that it can know where to find packages main files. (this can be done through the global `dir` property)
+ * however setting a `data-bowerreg` attribute to bowerder's script tag will be sufficient to it for determination of some needed like `bower components directory`.
  * 
  * with each import instruction, can be associated a callback function.
  * considered callback is executed when associated package's importation is fully done.
@@ -399,114 +405,155 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
         bower.loadingCount++ ;
         bower.total++ ;
         
-        bower.xhrGet( bower.dir +"/"+ pkgName +"/bower.json", true, function (reponse) {
+        if ((bower.components instanceof Object) && bower.components[ pkgName ]) {
             
-            if (reponse.error) {
+            var pkgConfig = bower.components[ pkgName ] ;
+            /* for reason due to size some properties in `bower.json` have been deleted with provided local registry (using bowerder on command line).
+             * `name` is one of them, and the reason of it was removed was to avoid duplication since as once can see, package's configuration is accessible with package's name.
+             * this is valable for `bower.components` (local registry), but not for `bower.packagesTree` (import registry), which need that `name` property to be set.
+            */
+            pkgConfig.name = pkgName ;
+            
+            loadPackageConfig( pkgConfig ) ;
+            
+            checkReadyToImport() ;
+        }
+        else {
+            
+            if ((bower.components instanceof Object) && !bower.components[ pkgName ]) {
                 
-                console.error("bowerder:addPackage: unable to load `"+ pkgName +"` component." );
-                
-                /* considering that the package will not be imported and
+                console.warn("bowerder:addPackage: can't found `"+ pkgName +"` in project's local registry ; will try to import package through Ajax API.") ;
+            }
+            
+            bower.xhrGet( bower.dir +"/"+ pkgName +"/bower.json", true, function (reponse) {
+
+                if (reponse.error) {
+
+                    console.error("bowerder:addPackage: unable to load `"+ pkgName +"` component." );
+
+                    /* considering that the package will not be imported and
                  * then will not be added to the packages's configuration registry,
                  * associated callback functions are executed with status error from bowerder.
                 */
-                if ((typeof cbIndex === "number" || cbIndex instanceof Number) && bower.callbacks[ pkgName ]) {
-                    
-                    bower.callbacks[ pkgName ][cbIndex]( {error: true, errorFrom: "bowerder"} ) ;
-                } 
-                
-                bower.browser.status.error = true ;
-                bower.browser.status.fromBowerder.push( pkgName ) ;                
-            }
-            else {
-                
-                var pkgConfig = JSON.parse( reponse.text ) ; 
+                    if ((typeof cbIndex === "number" || cbIndex instanceof Number) && bower.callbacks[ pkgName ]) {
 
-                if (pkgConfig instanceof Object) {
+                        bower.callbacks[ pkgName ][cbIndex]( {error: true, errorFrom: "bowerder"} ) ;
+                    } 
 
-                    delete pkgConfig['ignore'] ;
-                    delete pkgConfig['keywords'] ;
-                    delete pkgConfig['moduleType'] ;
-                    delete pkgConfig['resolutions'] ;
-
-                    if (!(pkgConfig.browser instanceof Object)) pkgConfig.browser = {} ;
-                    //by default,load and execute script asynchronously
-                    pkgConfig.browser.async = true ;
-                    //by default, files to load from the package aren't yet imported
-                    pkgConfig.browser.loaded = false ;
-                    //by default, set importation status to done without error  
-                    pkgConfig.browser.status = {error: false, errorFrom: undefined} ;
-                    //init the number of imported file counter for the package
-                    pkgConfig.browser.counter = 0 ;
-                    
-                    /* minification is a way for developper to have for some files a better loading optimization. 
-                     * however, `bower.json` spec do not allow to use minified files as mains files for a component.
-                     * developers use to set associated `main` property with sources or developments files.
-                     * considering how web projects are now build, that pratice isn't advantageous for browsers.
-                     * indeed, set an `index.scss` or an unminified `index.js` file as main file isn't good for browsers to digest.
-                     * that why is now recommended to also set a `browser: {main: []}` properties for mains files that browsers can easly digest.
-                     * minified files with sourcemaps are specialy welcome in that case.
-                     * bowerder will use that properties to load component *in the DOM*; if they aren't set, it will use the `main` property. 
-                     * here is an example illustration for bowerder to well do it job:
-                     * //bower.json
-                     *    main: ["dist/index.scss", "dist/index.coffee"], //keep bower json spec
-                     *    browser: {
-                     *       main: ["dist/index.min.css", "dist/index.min.js"] //for browsers through bowerder
-                     *    }
-                     *    ... //others properties
-                    */
-                    if (!pkgConfig.browser.main) {
-                        
-                        if (!pkgConfig.main) {
-                            
-                            console.warn("bowerder:addPackage: there isn't main files indication for "+ pkgName) ;
-                            pkgConfig.main = [] ;
-                        }
-                        
-                        pkgConfig.browser.main = (typeof pkgConfig.main === "string") ? [pkgConfig.main] : pkgConfig.main ;
-                    }
-
-                    /* if `pkgCaller` is set, then current loading package adress by `pkgName` is a dependency.
-                     * therefore, it have to be added before the `pkgCaller` in the packages's configuration registry.
-                     * else it's just a package to add in the considered registry.
-                    */
-                    if (pkgCaller) {
-
-                        //mark package to be synchronously loaded and executed
-                        pkgConfig.browser.async = false ;
-                        bower.package( pkgCaller ).browser.async = false ;
-
-                        if (bower.packageIndex( pkgCaller ) != -1) {
-
-                            bower.packagesTree.splice( bower.packageIndex( pkgCaller ), 0, pkgConfig) ;
-                        }
-                    }
-                    else {
-
-                        bower.packagesTree.push( pkgConfig ) ;
-                    }
-
-                    //if the current loading package have dependencies, then also process their loading
-                    if (pkgConfig["dependencies"]) {
-
-                        var pkgDeps = Object.getOwnPropertyNames( pkgConfig["dependencies"] );
-
-                        pkgDeps.forEach( function (name) {
-
-                            bower.addPackage( name, pkgConfig["name"]) ;
-                        }) ;
-                    }
+                    bower.browser.status.error = true ;
+                    bower.browser.status.fromBowerder.push( pkgName ) ;                
                 }
                 else {
 
-                    console.warn("bowerder:addPackage: unable to load `"+ pkgName +"` component." );
+                    var pkgConfig = JSON.parse( reponse.text ) ; 
+
+                    if (pkgConfig instanceof Object) {
+
+                        delete pkgConfig['ignore'] ;
+                        delete pkgConfig['keywords'] ;
+                        delete pkgConfig['moduleType'] ;
+                        delete pkgConfig['resolutions'] ;
+
+                        loadPackageConfig( pkgConfig ) ;
+                    }
+                    else {
+
+                        console.warn("bowerder:addPackage: unable to load `"+ pkgName +"` component." );
+                    }
+                } 
+
+                checkReadyToImport() ;
+            }) ;
+        }
+        
+        /**
+         * register package's configuration with it dependencies (if defined) in the packages's tree registry.
+         * @param {object} pkgConfig package's configuration from it `bower.json`
+         * @private
+         */
+        function loadPackageConfig (pkgConfig) {
+
+            if (!(pkgConfig.browser instanceof Object)) pkgConfig.browser = {} ;
+            //by default,load and execute script asynchronously
+            pkgConfig.browser.async = true ;
+            //by default, files to load from the package aren't yet imported
+            pkgConfig.browser.loaded = false ;
+            //by default, set importation status to done without error  
+            pkgConfig.browser.status = {error: false, errorFrom: undefined} ;
+            //init the number of imported file counter for the package
+            pkgConfig.browser.counter = 0 ;
+
+            /* minification is a way for developper to have for some files a better loading optimization. 
+             * however, `bower.json` spec do not allow to use minified files as mains files for a component.
+             * developers use to set associated `main` property with sources or developments files.
+             * considering how web projects are now build, that pratice isn't advantageous for browsers.
+             * indeed, set an `index.scss` or an unminified `index.js` file as main file isn't good for browsers to digest.
+             * that why is now recommended to also set a `browser: {main: []}` properties for mains files that browsers can easly digest.
+             * minified files with sourcemaps are specialy welcome in that case.
+             * bowerder will use that properties to load component *in the DOM*; if they aren't set, it will use the `main` property. 
+             * here is an example illustration for bowerder to well do it job:
+             * //bower.json
+             *    main: ["dist/index.scss", "dist/index.coffee"], //keep bower json spec
+             *    browser: {
+             *       main: ["dist/index.min.css", "dist/index.min.js"] //for browsers through bowerder
+             *    }
+             *    ... //others properties
+            */
+            if (!pkgConfig.browser.main) {
+
+                if (!pkgConfig.main) {
+
+                    console.warn("bowerder:addPackage: there isn't main files indication for "+ pkgName) ;
+                    pkgConfig.main = [] ;
                 }
-            } 
-            
+
+                pkgConfig.browser.main = (typeof pkgConfig.main === "string") ? [pkgConfig.main] : pkgConfig.main ;
+            }
+
+            /* if `pkgCaller` is set, then current loading package adress by `pkgName` is a dependency.
+             * therefore, it have to be added before the `pkgCaller` in the packages's configuration registry.
+             * else it's just a package to add in the considered registry.
+            */
+            if (pkgCaller) {
+
+                //mark package to be synchronously loaded and executed
+                pkgConfig.browser.async = false ;
+                bower.package( pkgCaller ).browser.async = false ;
+
+                if (bower.packageIndex( pkgCaller ) != -1) {
+
+                    bower.packagesTree.splice( bower.packageIndex( pkgCaller ), 0, pkgConfig) ;
+                }
+            }
+            else {
+
+                bower.packagesTree.push( pkgConfig ) ;
+            }
+
+            //if the current loading package have dependencies, then also process their loading
+            if (pkgConfig["dependencies"]) {
+
+                var pkgDeps = Object.getOwnPropertyNames( pkgConfig["dependencies"] );
+
+                pkgDeps.forEach( function (name) {
+
+                    bower.addPackage( name, pkgConfig["name"]) ;
+                }) ;
+            }
+        }
+
+        /**
+         * make sure that loadings packages's configuration process are ok with good dependencies organization,
+         * and proceed to packages importation *in the DOM* with correct order and associated behavior (callback, ...).
+         * @private
+         */
+        function checkReadyToImport() {
+
             bower.loadingCount-- ;
-            
+
             //when all the loading package process are finished, process their importation on the DOM.
             if (bower.loadingCount === 0) {
-                
+
                 /* if all loading package's configuration process have failed, 
                  * directly run globals callbacks (if they are).
                  * this, considering the fact that error can be check from callback by using the `status` argument.
@@ -517,7 +564,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                     bower.ready() ;
                 }
                 else {
-                    
+
                     //be sure to have unique package occurence in package's tree
                     for (var i=0; i < bower.packagesTree.length; i++) {
 
@@ -527,7 +574,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
 
                                 bower.packagesTree.splice( j, 1) ;
                                 bower.total-- ;
-                                
+
                                 j-- ;
                             }
                         }
@@ -628,7 +675,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                     console.log( bower.packagesTree ) ;
                 }
             }
-        }) ;
+        }
     }
 };
 
@@ -653,12 +700,86 @@ bower.import = function (pkgName, callback) {
             
             bower.callbacks[ pkgName ].push( callback ) ;
             
-            /* with current import's process, callback which is added to the callbacks's registry have the last index 
-             * that index is keeped and will be use to access to that callback if necessary in certains conditions
+            /* with current import's process, callback which is added to the callbacks's registry have the last index.
+             * that index is keeped and will be use to access to that callback if necessary in certains conditions.
+             * loader will be able to import package when the bower components's local registry state will be determinate.
             */
-            bower.addPackage( pkgName, null, (bower.callbacks[ pkgName ].length - 1) ) ;
+            if (!(bower.components instanceof Object) && bower.components !== null) {
+                
+                bower.browser.waitingImport.push( {name: pkgName, cbIndex: (bower.callbacks[ pkgName ].length - 1)} ) ;
+            }
+            else bower.addPackage( pkgName, null, (bower.callbacks[ pkgName ].length - 1) ) ;
         }
     }
-    else  bower.addPackage( pkgName ) ;
+    else {
+        
+        if (!(bower.components instanceof Object) && bower.components !== null) {
+
+            bower.browser.waitingImport.push( {name: pkgName, cbIndex: undefined} ) ;
+        }
+        bower.addPackage( pkgName ) ;
+    } 
 
 };
+
+
+/* first execution zone
+------------------------*/
+/* developer can manually include the bower components's local registry *in the DOM*.
+ * if not, the bowerder have to try to include it by itself for better performence for loading process.
+*/
+if (bower.components === undefined) {
+    /* loader script have to be include *in the DOM* with the `data-bowerreg` attribute setting.
+     * that attribute will help to know which tag have to be use to automate local packages's registry loading.
+    */
+    var bowerderTag = undefined ;
+    
+    if (document.querySelector) {
+        //efficient : this is for all major browsers and IE>8
+        bowerderTag = document.querySelector('script[data-bowerreg]') ;
+    }
+    else { //alternative with more hack : this is specialy for IE<=8
+
+        var domScriptTags = document.getElementsByTagName('scrpit') ;
+
+        for (var j=0; j < domScriptTags.length; j++) {
+
+            if (domScriptTags[j].getAttribute('data-bowerreg')) {
+
+                bowerderTag = domScriptTags[j] ;
+                break ;
+            }
+        }
+    }
+    
+    if (bowerderTag) {
+        
+        //assuming that loader path will usually be `path-to-bowerdir/bowerder/dist/loader.js`
+        bower.dir = bowerderTag.src ;
+        for (var i=0; i<3; i++) bower.dir = bower.dir.slice( bower.dir.lastIndexOf('/') ) ;
+        
+        bower.browser.regTag = document.createElement('script') ;
+        bower.browser.regTag.onload = function () {
+            
+            if (!(bower.components instanceof Object)) {
+                
+                bower.components = null ; //will allow not already run import's function call to skip waiting import step
+                console.warn('bowerder: local registry didn\'t found, loader will try to import package through Ajax API.') ;
+            }
+            
+            bower.browser.waitingImport.forEach( function (pkgName) {
+                
+                bower.addPackage( pkgName ) ;
+            });
+            //bower.browser.waitingImport = [] ;
+        } ;
+        bower.browser.regTag.onreadystatechange = bower.browser.regTag.onerror = bower.browser.regTag.onload ;
+        
+        bower.browser.regTag.src = bower.dir +'/.bowerreg.js' ;
+    }
+    else {
+        
+        bower.components = null ; //will allow not already run import's function call to skip waiting import step
+        console.warn('bowerder: seems that local registry didn\'t provided ; if so, loader will try to import package through Ajax API.') ;
+    }
+}
