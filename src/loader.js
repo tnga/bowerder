@@ -61,10 +61,12 @@ bower.total = 0 ;          //total number of packages that must to be loaded
 bower.callbacks = {} ;     //packages's callback functions registry 
 bower.packagesTree = [] ;  //packages's configuration registry
 
-bower.browser = {          // these properties will help in some case for bowerder global processing.
+bower.browser = {          //these properties will help in some case for bowerder global processing.
     loaded: false ,
-    waitingCB: [], //index of callbacks's to be execute after full packages's importation "in the DOM" 
-    status: {error: "false", fromBrowser: [], fromBowerder: []}
+    regTag: undefined ,    //reference to *local packages's registry* script tag
+    waitingCB: [],         //index of callbacks's to be execute after full packages's importation "in the DOM" 
+    waitingImport: [],     //for package that will wait for *local packages's registry* state, before to be imported
+    status: {error: "false", fromBrowser: [], fromBowerder: []} ,
 } ;
 
 
@@ -717,7 +719,7 @@ bower.import = function (pkgName, callback) {
 
             bower.browser.waitingImport.push( {name: pkgName, cbIndex: undefined} ) ;
         }
-        bower.addPackage( pkgName ) ;
+        else bower.addPackage( pkgName ) ;
     } 
 
 };
@@ -767,15 +769,18 @@ if (bower.components === undefined) {
                 console.warn('bowerder: local registry didn\'t found, loader will try to import package through Ajax API.') ;
             }
             
-            bower.browser.waitingImport.forEach( function (pkgName) {
+            bower.browser.waitingImport.forEach( function (pkgInfo) {
                 
-                bower.addPackage( pkgName ) ;
+                bower.addPackage( pkgInfo.name, null, pkgInfo.cbIndex ) ;
             });
             //bower.browser.waitingImport = [] ;
         } ;
         bower.browser.regTag.onreadystatechange = bower.browser.regTag.onerror = bower.browser.regTag.onload ;
         
+        bower.browser.regTag.setAttribute("data-bowerpkg", "#bowerder") ;
         bower.browser.regTag.src = bower.dir +'/.bowerreg.js' ;
+        
+        document.head.appendChild( bower.browser.regTag ) ;
     }
     else {
         
