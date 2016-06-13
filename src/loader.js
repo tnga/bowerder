@@ -766,7 +766,7 @@ if (bower.components === undefined) {
             if (!(bower.components instanceof Object)) {
                 
                 bower.components = null ; //will allow not already run import's function call to skip waiting import step
-                console.warn('bowerder: local registry didn\'t found, loader will try to import package through Ajax API.') ;
+                console.warn('bowerder: local registry isn\'t found, loader will try to import package through Ajax API.') ;
             }
             
             bower.browser.waitingImport.forEach( function (pkgInfo) {
@@ -785,6 +785,6 @@ if (bower.components === undefined) {
     else {
         
         bower.components = null ; //will allow not already run import's function call to skip waiting import step
-        console.warn('bowerder: seems that local registry didn\'t provided ; if so, loader will try to import package through Ajax API.') ;
+        console.warn('bowerder: seems that local registry isn\'t provided ; if so, loader will try to import package through Ajax API.') ;
     }
 }
