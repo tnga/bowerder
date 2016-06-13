@@ -773,7 +773,7 @@ if (bower.components === undefined) {
                 
                 bower.addPackage( pkgInfo.name, null, pkgInfo.cbIndex ) ;
             });
-            //bower.browser.waitingImport = [] ;
+            bower.browser.waitingImport = [] ;
         } ;
         bower.browser.regTag.onreadystatechange = bower.browser.regTag.onerror = bower.browser.regTag.onload ;
         
