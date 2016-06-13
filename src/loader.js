@@ -55,7 +55,7 @@ if (typeof bower !== "undefined" && !(bower.components instanceof Object)) {
  * to better manage some stuff, the loader can set extras porperties through the `browser` object, which will be itself a property of the package's configuration object. 
 */
 
-bower.dir = "../.." ;      //bower base directory
+bower.dir = "./bower_components" ;      //bower base directory
 bower.loadingCount = 0 ;   //number of package that are in loading process
 bower.total = 0 ;          //total number of packages that must to be loaded
 bower.callbacks = {} ;     //packages's callback functions registry 
@@ -756,7 +756,7 @@ if (bower.components === undefined) {
         
         //assuming that loader path will usually be `path-to-bowerdir/bowerder/dist/loader.js`
         bower.dir = bowerderTag.src ;
-        for (var i=0; i<3; i++) bower.dir = bower.dir.slice( bower.dir.lastIndexOf('/') ) ;
+        for (var i=0; i<3; i++) bower.dir = bower.dir.slice(0, bower.dir.lastIndexOf('/') ) ;
         
         bower.browser.regTag = document.createElement('script') ;
         bower.browser.regTag.onload = function () {
