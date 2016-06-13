@@ -25,9 +25,9 @@ if (typeof bower !== "undefined" && !(bower.components instanceof Object)) {
  * dependencies will always be imported before package of which depends ; this influences how order is done in packages's configuration registry.
  * package have to have a unique occurrence on the registry ; this assure that we will not have duplicate component's import.
  * that particular registry is the *dependencies package's tree registry*.
- * there will be also a main registry which is the *local package's registry*, that will content all project's components's configurations installed via bower.
- * there will be therefore a provided command line tools (`bowerder`) that will help developer to generate the considered *local package's registry* for a target project.
- * if the loader can't use any associated *local package's registry* to import packages, it will try to use Ajax API to resolve the operation.
+ * there will be also a main registry which is the *local packages's registry*, that will content all project's components's configurations installed via bower.
+ * there will be therefore a provided command line tools (`bowerder`) that will help developer to generate the considered *local packages's registry* for a target project.
+ * if the loader can't use any associated *local packages's registry* to import packages, it will try to use Ajax API to resolve the operation.
  * bower components directory have to be provided to loader so that it can know where to find packages main files. (this can be done through the global `dir` property)
  * however setting a `data-bowerreg` attribute to bowerder's script tag will be sufficient to it for determination of some needed like `bower components directory`.
  * 
