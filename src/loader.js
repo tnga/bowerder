@@ -56,6 +56,7 @@ if (typeof bower !== "undefined" && !(bower.components instanceof Object)) {
 */
 
 bower.dir = "./bower_components" ;      //bower base directory
+//bower.devMode = false ;      //bower base directory
 bower.loadingCount = 0 ;   //number of package that are in loading process
 bower.total = 0 ;          //total number of packages that must to be loaded
 bower.callbacks = {} ;     //packages's callback functions registry 
@@ -434,9 +435,9 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                     console.error("bowerder:addPackage: unable to load `"+ pkgName +"` component." );
 
                     /* considering that the package will not be imported and
-                 * then will not be added to the packages's configuration registry,
-                 * associated callback functions are executed with status error from bowerder.
-                */
+                     * then will not be added to the packages's configuration registry,
+                     * associated callback functions are executed with status error from bowerder.
+                    */
                     if ((typeof cbIndex === "number" || cbIndex instanceof Number) && bower.callbacks[ pkgName ]) {
 
                         bower.callbacks[ pkgName ][cbIndex]( {error: true, errorFrom: "bowerder"} ) ;
@@ -588,7 +589,10 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                         //Oh the tragedy, detecting opera. See the usage of isOpera for reason.
                         isOpera = typeof opera !== 'undefined' && opera.toString() === '[object Opera]',
                         loaderTag = undefined ,
-                        getTag = undefined ; //supported tag
+                        domLoaderTags = undefined ,
+                        devLinkTag = undefined ,   //first custom link tag include by developer *in the document's <head>*
+                        devScriptTag = undefined , //first custom Script tag include by developer *in the document's <head>*
+                        getTag = undefined ;       //supported tag
 
                     bower.packagesTree.forEach( function (pkg) {
 
@@ -602,7 +606,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                         }
                         else { //alternative with more hack : this is specialy for IE<=8
 
-                            var domLoaderTags = [].slice.call( document.head.getElementsByTagName("link") ) ;
+                            domLoaderTags = [].slice.call( document.head.getElementsByTagName("link") ) ;
                             domLoaderTags = domLoaderTags.concat( [].slice.call( document.head.getElementsByTagName("scrpit") ) ) ;
                             for (var j=0; j < domLoaderTags.length; j++) {
 
@@ -668,11 +672,64 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                             }
                         }
                     }) ;
+                    
+                    /* genrally, developer use to include custom stylesheets or scripts,
+                     * to overwrite library's properties or functions.
+                     * this is done by including library first, before that custom hacks.
+                     * therefore bowerder have to do the same to maintain that habit.
+                     * loader can identify it imported packages with the `data-bowerpkg` attribute.
+                     * it just to make sure to import them before non `data-bowerpkg` considered tag *in document <head>*.
+                     */ 
+                    domLoaderTags = document.head.getElementsByTagName("link") ;
+                    for (var i=0; i < domLoaderTags.length; i++) {
+                        
+                        if (!domLoaderTags[i].getAttribute("data-bowerpkg") && domLoaderTags[i].rel && (domLoaderTags[i].rel !== "icon")) {
+                            
+                            devLinkTag = domLoaderTags[i] ;
+                            break ;
+                        }
+                    }
+                    domLoaderTags = document.head.getElementsByTagName("script") ;
+                    for (var i=0; i < domLoaderTags.length; i++) {
+                        
+                        if (!domLoaderTags[i].getAttribute("data-bowerpkg")) {
+                           
+                            devScriptTag = domLoaderTags[i] ;
+                            break ;
+                        }
+                    }
 
-                    pkgLinkTags.concat( pkgScriptTags ).forEach( function(loaderTag) {
+                    //Link tags importation process "in the DOM"
+                    if (devLinkTag) {
+                        
+                        pkgLinkTags.forEach( function (loaderTag) {
 
-                        document.head.appendChild( loaderTag ) ;
-                    }) ;
+                            document.head.insertBefore( loaderTag, devLinkTag ) ;
+                        }) ;
+                    }
+                    else {
+                        
+                        pkgLinkTags.forEach( function (loaderTag) {
+
+                            document.head.appendChild( loaderTag ) ;
+                        }) ;
+                    }
+                    
+                    //Script tags importation process "in the DOM"
+                    if (devScriptTag) {
+                        
+                        pkgScriptTags.forEach( function (loaderTag) {
+
+                            document.head.insertBefore( loaderTag, devScriptTag ) ;
+                        }) ;
+                    }
+                    else {
+                        
+                        pkgScriptTags.forEach( function (loaderTag) {
+
+                            document.head.appendChild( loaderTag ) ;
+                        }) ;
+                    }
 
                     console.log( bower.packagesTree ) ;
                 }
