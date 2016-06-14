@@ -36,7 +36,7 @@ if (typeof bower !== "undefined" && !(bower.components instanceof Object)) {
  * package's importation is fully done when all it main files are loaded *in the DOM*.
  * a callback take an object as argument with the following properties:
  * `error` : a boolean which inform if the associated package's importation was fully done or not ;
- * `errorFrom` : a string which inform about the place where the error occure, possible value are "browser" or "bowerder" ;
+ * `errorFrom` : a string which inform about the place where the error occured, possible value are "browser" or "bowerder" ;
  *    if the value is "bowerder" it's maybe an internal/connection error when loading package configuration (bower.json),
  *    if the value is "browser" it's maybe a 404/connection error on loading main files *in the DOM* ;
  *    therefore, console is the place to see what really happen.
@@ -48,8 +48,8 @@ if (typeof bower !== "undefined" && !(bower.components instanceof Object)) {
  * for some globals tasks, global callbacks can be managed through the special bowerder "reserved" package's named `#bowerder`.
  * global callback take an object as argument with the following properties:
  * `error` : a boolean which inform if all package's importation was fully done or not ;
- * `errorBrowser` : an array which inform about packages where error occure and if it was from "browser" loading operations ;
- * `errorBowerder` : an array which inform about packages where error occure and if it was from "bowerder" loading operations ;
+ * `errorBrowser` : an array which inform about packages where error occured and if it was from "browser" loading operations ;
+ * `errorBowerder` : an array which inform about packages where error occured and if it was from "bowerder" loading operations ;
  *    therefore, console is the place to see what really happen.
  *    
  * to better manage some stuff, the loader can set extras porperties through the `browser` object, which will be itself a property of the package's configuration object. 
