@@ -93,7 +93,7 @@ manager.automate = function (bowerpath) {
     watcher
         .on('ready', function () {
 
-            console.log('\nbowerder: start watching for local registry\'s automatic updated\n') ;
+            console.log('\nbowerder: start watching for local registry\'s automatic update\n') ;
         })
         .on('addDir', function (path) {
 
