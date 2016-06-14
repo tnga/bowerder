@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+
+var chokidar = require('chokidar') ;
+var path = require('path') ;
+var manager = require('../src/manager') ;
+var bowerrc = require('bower-config').read( process.cwd() ) ;
+
+var counter = 0 ; //will be use to now if all package's `bower.json` have been checked
+var bowerreg = {} ; //will be use as bower components registry for considered project
+
+manager.genregistry( path.join( bowerrc.cwd, bowerrc.directory) ) ;
+
+if (process.argv[2] === "auto") {
+    
+    manager.automate( path.join( bowerrc.cwd, bowerrc.directory) ) ;
+}
+else if (process.argv[2] !== undefined) {
+    
+    console.error("unknow command `"+ process.argv[2] +"`") ;
+    console.log("actual usage: \n `bowerder auto` : watch and auto refresh components's registry") ;
+}
