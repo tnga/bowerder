@@ -33,7 +33,7 @@ if (typeof bower !== 'undefined' && !(bower.components instanceof Object)) {
  * 
  * with each import instruction, can be associated a callback function.
  * considered callback is executed when associated package's importation is fully done.
- * package's importation is fully done when all it main files are loaded *in the DOM*.
+ * package's importation is fully done when all it main files and it dependencies main files (if defined) are loaded *in the DOM*.
  * a callback take an object as argument with the following properties:
  * `error` : a boolean which inform if the associated package's importation was fully done or not;
  * `errorFrom` : a string which inform about the place where the error occured, possible value are "browser" or "bowerder";
