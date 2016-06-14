@@ -1,0 +1,42 @@
+{
+  "name": "bowerder",
+  "version": "0.0.0",
+  "description": "the bower component loader for browsers",
+  "main": "src/manager.js",
+  "bin": "bin/bowerder",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tnga/bowerder.git"
+  },
+  "keywords": [
+    "bower",
+    "bowerder",
+    "browser",
+    "loader",
+    "import",
+    "component",
+    "package",
+    "module",
+    "registry"
+  ],
+  "author": "Tindo N. Arsel <devtnga@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tnga/bowerder/issues"
+  },
+  "homepage": "https://github.com/tnga/bowerder#readme",
+  "dependencies": {
+    "bower-config": "^1.4.0",
+    "chokidar": "^1.5.2"
+  }
+}
