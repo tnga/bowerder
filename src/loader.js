@@ -35,8 +35,8 @@ if (typeof bower !== 'undefined' && !(bower.components instanceof Object)) {
  * considered callback is executed when associated package's importation is fully done.
  * package's importation is fully done when all it main files and it dependencies main files (if defined) are loaded *in the DOM*.
  * a callback take an object as argument with the following properties:
- * `error` : a boolean which inform if the associated package's importation was fully done or not;
- * `errorFrom` : a string which inform about the place where the error occured, possible value are "browser" or "bowerder";
+ * `occured` : a boolean which inform if the associated package's importation was fully done or not (if an error occured or not);
+ * `from` : a string which inform about the place where the error occured, possible value are "browser" or "bowerder";
  *    if the value is "bowerder" it's maybe an internal/connection error when loading package configuration (bower.json),
  *    if the value is "browser" it's maybe a 404/connection error on loading main files *in the DOM*;
  *    therefore, console is the place to see what really happen.
@@ -47,9 +47,9 @@ if (typeof bower !== 'undefined' && !(bower.components instanceof Object)) {
  * 
  * for some globals tasks, global callbacks can be managed through the special bowerder "reserved" package's named `#bowerder`.
  * global callback take an object as argument with the following properties:
- * `error` : a boolean which inform if all package's importation was fully done or not;
- * `errorBrowser` : an array which inform about packages where error occured and if it was from "browser" loading operations;
- * `errorBowerder` : an array which inform about packages where error occured and if it was from "bowerder" loading operations;
+ * `occured` : a boolean which inform if all package's importation was fully done or not (if an error occured or not);
+ * `fromBrowser` : an array which inform about packages where error occured and if it was from "browser" loading operations;
+ * `fromBowerder` : an array which inform about packages where error occured and if it was from "bowerder" loading operations;
  *    therefore, console is the place to see what really happen.
  *    
  * to better manage some stuff, the loader can set extras porperties through the `browser` object, which will be itself a property of the package's configuration object. 
@@ -68,7 +68,7 @@ bower.browser = {          // these properties will help in some case for bowerd
    loaderTag: undefined, // reference to bowerder's script tag
    waitingCB: [],         // index of callbacks's to be execute after full packages's importation "in the DOM" 
    waitingImport: [],     // for package that will wait for *local packages's registry* state, before to be imported
-   status: {error: false, fromBrowser: [], fromBowerder: []},
+   error: {occured: false, fromBrowser: [], fromBowerder: []},
 };
 
 
@@ -206,7 +206,7 @@ bower.checkCallback = function (pkgName) {
 
          bower.callbacks[ pkgName ].forEach( function (callback) {
 
-            callback( bower.package( pkgName ).browser.status );
+            callback( bower.package( pkgName ).browser.error );
          });
       }
 
@@ -255,7 +255,7 @@ bower.ready = function (callback) {
 
       bower.browser.waitingCB.forEach( function (cbIndex) {
 
-         bower.callbacks['#bowerder'][cbIndex]( bower.browser.status );
+         bower.callbacks['#bowerder'][cbIndex]( bower.browser.error );
       });
    }
 };  
@@ -314,9 +314,9 @@ bower.attachPackageCB = function (node, pkgName) {
       node.addEventListener('load', function () { bower.checkCallback( pkgName ); }, false);
       node.addEventListener('error', function () { 
 
-         bower.package( pkgName ).browser.status = {error: true, errorFrom: 'browser'};
-         bower.browser.status.error = true;
-         bower.browser.status.fromBrowser.push( pkgName );
+         bower.package( pkgName ).browser.error = {occured: true, from: 'browser'};
+         bower.browser.error.occured = true;
+         bower.browser.error.fromBrowser.push( pkgName );
 
          bower.checkCallback( pkgName ); 
       }, false );
@@ -393,7 +393,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
       // if the package is already fully loaded *in the DOM*, the current associated callback is executed.
       if (cbIndex && bower.package( pkgName ).browser.loaded && bower.callbacks[ pkgName ]) {
 
-         bower.callbacks[ pkgName ][cbIndex]( bower.package( pkgName ).browser.status );
+         bower.callbacks[ pkgName ][cbIndex]( bower.package( pkgName ).browser.error );
       }
 
       if (pkgCaller && (bower.packageIndex( pkgCaller ) != -1) ) {
@@ -441,15 +441,15 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
 
                /* considering that the package will not be imported and
                 * then will not be added to the packages's configuration registry,
-                * associated callback functions are executed with status error from bowerder.
+                * associated callback functions are executed with error from bowerder.
                */
                if ((typeof cbIndex === 'number' || cbIndex instanceof Number) && bower.callbacks[ pkgName ]) {
 
-                  bower.callbacks[ pkgName ][cbIndex]( {error: true, errorFrom: 'bowerder'} );
+                  bower.callbacks[ pkgName ][cbIndex]( {occured: true, from: 'bowerder'} );
                } 
 
-               bower.browser.status.error = true;
-               bower.browser.status.fromBowerder.push( pkgName );                
+               bower.browser.error.occured = true;
+               bower.browser.error.fromBowerder.push( pkgName );                
             }
             else {
 
@@ -487,7 +487,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
          // by default, files to load from the package aren't yet imported
          pkgConfig.browser.loaded = false;
          // by default, set importation status to done without error  
-         pkgConfig.browser.status = {error: false, errorFrom: undefined};
+         pkgConfig.browser.error = {occured: false, from: undefined};
          // init the number of imported file counter for the package
          pkgConfig.browser.counter = 0;
 
@@ -564,7 +564,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
 
             /* if all loading package's configuration process have failed, 
              * directly run globals callbacks (if they are).
-             * this, considering the fact that error can be check from callback by using the `status` argument.
+             * this, considering the fact that error can be check from callback by using the `error` argument.
             */
             if (bower.packagesTree.length === 0) {
 

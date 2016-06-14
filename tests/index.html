@@ -30,31 +30,31 @@
     <script src="weblibs/bowerder/src/loader.js" data-bowerreg></script>
     <!--<script src="weblibs/.bowerreg.js"></script>-->
     <script>
-      bower.ready( function (status) {
+      bower.ready( function (err) {
 
-        alert("before all previous importation. [error: "+ status.error +"]") ;
+        alert("before all previous importation. [error: "+ err.occured +"]") ;
       }) ;
       
       //bower.dir = "weblibs"
       bower.devMode = true ;
-      bower.import("bootstrap" , function (status) {alert("bootstrap [error: "+ status.error +"]");}) ;
-      bower.import("reveal.js", function (status) {alert("reveal [error: "+ status.error +"]");}) ;
-      bower.import("font-awesome", function (status) {alert("font-awesome [error: "+ status.error +"]");}) ;
-      bower.import("ijs", function (status) {alert("ijs [error: "+ status.error +"]");}) ;
+      bower.import("bootstrap" , function (err) {alert("bootstrap [error: "+ err.occured +"]");}) ;
+      bower.import("reveal.js", function (err) {alert("reveal [error: "+ err.occured +"]");}) ;
+      bower.import("font-awesome", function (err) {alert("font-awesome [error: "+ err.occured +"]");}) ;
+      bower.import("ijs", function (err) {alert("ijs [error: "+ err.occured +"]");}) ;
       
       //bootstrap depend of jquery, so this line isn't needed.
       //this is to show flexibility in case of duplicate component's importation.
       bower.import("jquery") ;
       
       //see how this can be called after some group of import in which given global callback depend of.
-      bower.ready( function (status) {
+      bower.ready( function (err) {
         
-        alert("after all previous importation. [error: "+ status.error +"]") ;
+        alert("after all previous importation. [error: "+ err.occured +"]") ;
       }) ;
       
       setTimeout(function() {
         
-        bower.import("ijs", function (status) {alert("ijs after already imported [error: "+ status.error +"]");}) ;
+        bower.import("ijs", function (err) {alert("ijs after already imported [error: "+ err.occured +"]");}) ;
         
         $("span").text("...unique importation") ;
       }, 5000);
