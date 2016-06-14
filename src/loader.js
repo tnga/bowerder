@@ -65,6 +65,7 @@ bower.packagesTree = [] ;  //packages's configuration registry
 bower.browser = {          //these properties will help in some case for bowerder global processing.
     loaded: false ,
     regTag: undefined ,    //reference to *local packages's registry* script tag
+    loaderTag: undefined , //reference to bowerder's script tag
     waitingCB: [],         //index of callbacks's to be execute after full packages's importation "in the DOM" 
     waitingImport: [],     //for package that will wait for *local packages's registry* state, before to be imported
     status: {error: "false", fromBrowser: [], fromBowerder: []} ,
@@ -802,11 +803,9 @@ if (bower.components === undefined) {
     /* loader script have to be include *in the DOM* with the `data-bowerreg` attribute setting.
      * that attribute will help to know which tag have to be use to automate local packages's registry loading.
     */
-    var bowerderTag = undefined ;
-    
     if (document.querySelector) {
         //efficient : this is for all major browsers and IE>8
-        bowerderTag = document.querySelector('script[data-bowerreg]') ;
+        bower.browser.loaderTag = document.querySelector('script[data-bowerreg]') ;
     }
     else { //alternative with more hack : this is specialy for IE<=8
 
@@ -816,16 +815,16 @@ if (bower.components === undefined) {
 
             if (domScriptTags[j].getAttribute('data-bowerreg')) {
 
-                bowerderTag = domScriptTags[j] ;
+                bower.browser.loaderTag = domScriptTags[j] ;
                 break ;
             }
         }
     }
     
-    if (bowerderTag) {
+    if (bower.browser.loaderTag) {
         
         //assuming that loader path will usually be `path-to-bowerdir/bowerder/dist/loader.js`
-        bower.dir = bowerderTag.src ;
+        bower.dir = bower.browser.loaderTag.src ;
         for (var i=0; i<3; i++) bower.dir = bower.dir.slice(0, bower.dir.lastIndexOf('/') ) ;
         
         bower.browser.regTag = document.createElement('script') ;
