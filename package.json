@@ -12,7 +12,7 @@
     "src"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"take a look to the tests/index.html...\nlocal registry will now be auto updated with any bower operation on tests folder\n\" && sleep 5 && cd tests/ && ../bin/bowerder auto"
   },
   "repository": {
     "type": "git",
