@@ -365,6 +365,12 @@ bower.parseTagType = function (targetFile) {
     return tag ;
 } ;
 
+/**
+ * organize packages's tree dependencies, process their importation "in the DOM" with asssociated callback if available
+ * @param   {string}   pkgName   package's name
+ * @param   {string}   pkgCaller package's of package which depends of first (argument) given package. usefull for dependencies management.
+ * @param   {number}   cbIndex   index of current associated callback in callbacks's registry (if given)
+ */
 bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
     
     if (typeof pkgName !== "string" && !(pkgName instanceof String)) {
@@ -739,6 +745,11 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
 };
 
 
+/**
+ * import packages "in the DOM" with their dependecies 
+ * @param   {string}   pkgName  package's name
+ * @param   {function} callback function to run after full package's importation
+*/
 bower.import = function (pkgName, callback) {
     
     if (typeof pkgName !== "string" && !(pkgName instanceof String)) {
