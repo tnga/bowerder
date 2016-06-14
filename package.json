@@ -38,5 +38,13 @@
   "dependencies": {
     "bower-config": "^1.4.0",
     "chokidar": "^1.5.2"
+  },
+  "devDependencies": {
+    "es6-promise": "^3.2.1",
+    "gulp": "^3.9.1",
+    "gulp-notify": "^2.2.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^1.5.3"
   }
 }
