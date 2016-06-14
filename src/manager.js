@@ -9,23 +9,23 @@
  * @author  [Tindo Ngoufo Arsel](mailto:devtnga@gmail.com)
 */
 
-var fs = require('fs') ;
-var path = require('path') ;
+var fs = require('fs');
+var path = require('path');
 var chokidar = require('chokidar');
 
-var manager = {} ;
+var manager = {};
 /**
  * generate `bowerreg.js` registry for installed components through bower
  * @param {string} bowerpath path to installed components directory for considered project
  */
 manager.genregistry = function (bowerpath) {
 
-   var counter = 0 ; //will be use to now if all package's `bower.json` have been checked
-   var bowerreg = {} ; //will be use as bower components registry for considered project
+   var counter = 0; //will be use to now if all package's `bower.json` have been checked
+   var bowerreg = {}; //will be use as bower components registry for considered project
 
    fs.readdir( bowerpath, function (err, files) {
 
-      if (err) throw err ;
+      if (err) throw err;
 
       files.forEach( function (fileName) {
 
@@ -33,50 +33,50 @@ manager.genregistry = function (bowerpath) {
 
             if (stats.isDirectory() && fileName !== "bowerder") {
 
-               counter++ ;
+               counter++;
 
                fs.readFile( path.join( bowerpath, fileName, 'bower.json'), 'utf8', function (err, content) {
 
                   if (err) {
 
-                     console.warn("waiting for "+ path.join( bowerpath, fileName, 'bower.json')) ;
+                     console.warn("waiting for "+ path.join( bowerpath, fileName, 'bower.json'));
                   }
                   else {
 
-                     var pkgConfig = JSON.parse( content ) ;
+                     var pkgConfig = JSON.parse( content );
 
-                     delete pkgConfig['ignore'] ;
-                     delete pkgConfig['keywords'] ;
-                     delete pkgConfig['moduleType'] ;
-                     delete pkgConfig['resolutions'] ;
+                     delete pkgConfig['ignore'];
+                     delete pkgConfig['keywords'];
+                     delete pkgConfig['moduleType'];
+                     delete pkgConfig['resolutions'];
 
-                     bowerreg[ pkgConfig.name ] = pkgConfig ;
+                     bowerreg[ pkgConfig.name ] = pkgConfig;
                      //package are accessible in the registry by name so name property isn't needed
-                     delete bowerreg[ pkgConfig.name ].name ;
+                     delete bowerreg[ pkgConfig.name ].name;
                   }
 
-                  counter-- ;
+                  counter--;
                   if (counter === 0) { //all bower.json have been checked
 
                      fs.writeFile( path.join( bowerpath, '.bowerreg.js'),
                                   '//manage possible conflict with loader namespace definition. \n'+
                                   'if (typeof bower !== "undefined" && typeof bower.import !== "function" && typeof bower.addPackage !== "function") {'+
-                                  ' console.warn("Seem like `bower` namespace is use for another purpose. Taking risk of an overwrite ...") ;'+
-                                  ' window.bower = bower = {} ;'+  
+                                  ' console.warn("Seem like `bower` namespace is use for another purpose. Taking risk of an overwrite ...");'+
+                                  ' window.bower = bower = {};'+  
                                   '} else  if (typeof bower === "undefined") {'+
-                                  ' window.bower = {} ;'+
+                                  ' window.bower = {};'+
                                   '} \n//available packages\n'+
                                   'bower.components = '+ JSON.stringify( bowerreg ) +';',
                         function (err) {
-                           if (err) throw err ; 
+                           if (err) throw err; 
                      });
                   }
-               }) ;
+               });
             }
-         }) ;    
-      }) ;
-   }) ;
-} ;
+         });    
+      });
+   });
+};
 
 /**
  * watch and auto refresh registry for installed/romoved/changed components
@@ -93,28 +93,28 @@ manager.automate = function (bowerpath) {
    watcher
       .on('ready', function () {
 
-         console.log('\nbowerder: start watching for local registry\'s automatic update\n') ;
+         console.log('\nbowerder: start watching for local registry\'s automatic update\n');
       })
       .on('addDir', function (path) {
 
-         manager.genregistry( bowerpath ) ;
-         console.log('bowerder: local registry updated with added content: '+ path) ;
+         manager.genregistry( bowerpath );
+         console.log('bowerder: local registry updated with added content: '+ path);
       })
       .on('unlinkDir', function (path) {
 
-         manager.genregistry( bowerpath ) ;
-         console.log('bowerder: local registry updated with removed content: '+ path) ;
+         manager.genregistry( bowerpath );
+         console.log('bowerder: local registry updated with removed content: '+ path);
       })
       .on('change', function (path) {
 
-         manager.genregistry( bowerpath ) ;
-         console.log('bowerder: local registry updated with changed content: '+ path) ;
+         manager.genregistry( bowerpath );
+         console.log('bowerder: local registry updated with changed content: '+ path);
       })
       .on('error', function (error) {
 
-         manager.genregistry( bowerpath ) ;
-         console.log('bowerder: local registry updated with error: '+ error) ;
-      }) ;
-} ;
+         manager.genregistry( bowerpath );
+         console.log('bowerder: local registry updated with error: '+ error);
+      });
+};
 
-module.exports = manager ;
+module.exports = manager;
