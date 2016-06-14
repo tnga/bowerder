@@ -56,7 +56,7 @@ if (typeof bower !== "undefined" && !(bower.components instanceof Object)) {
 */
 
 bower.dir = "./bower_components" ;      //bower base directory
-//bower.devMode = false ;      //bower base directory
+bower.devMode = false ;      //bower base directory
 bower.loadingCount = 0 ;   //number of package that are in loading process
 bower.total = 0 ;          //total number of packages that must to be loaded
 bower.callbacks = {} ;     //packages's callback functions registry 
@@ -673,7 +673,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                         }
                     }) ;
                     
-                    /* genrally, developer use to include custom stylesheets or scripts,
+                    /* generally, developer use to include custom stylesheets or scripts,
                      * to overwrite library's properties or functions.
                      * this is done by including library first, before that custom hacks.
                      * therefore bowerder have to do the same to maintain that habit.
@@ -731,7 +731,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                         }) ;
                     }
 
-                    console.log( bower.packagesTree ) ;
+                    if (bower.devMode) console.log( bower.packagesTree ) ;
                 }
             }
         }
