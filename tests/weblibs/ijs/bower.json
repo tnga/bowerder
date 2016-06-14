@@ -1,0 +1,41 @@
+{
+  "name": "ijs",
+  "homepage": "https://github.com/tnga/lib.ijs",
+  "authors": [
+    "tnga <devtnga@gmail.com>"
+  ],
+  "description": "\"Mini library for javaScript language. It provide functionalities that facilitate web's project development and it can be associated with all existing JS libraries.\"",
+  "main": "i.min.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "ijs",
+    "i.js",
+    "iJS",
+    "animations",
+    "web-animations",
+    "gettext",
+    "po",
+    "mo",
+    "json",
+    "internationalization",
+    "javascript",
+    "buffer",
+    "ajax",
+    "umi",
+    "project",
+    "js"
+  ],
+  "license": "LGPL 2.0 or later",
+  "ignore": [
+    "**/.*",
+    "i-js-build",
+    "node_modules",
+    "bower_components",
+    "src",
+    "docs",
+    "test",
+    "tests"
+  ]
+}
