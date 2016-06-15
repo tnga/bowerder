@@ -1,7 +1,10 @@
 {
   "name": "bowerder",
   "description": "the bower component loader for browsers",
-  "main": "dist/loader.js",
+  "main": "src/loader.js",
+  "browser": {
+    "main": ["dist/loader.min.js"]
+  },
   "authors": [
     "Tindo N. Arsel <devtnga@gmail.com>"
   ],
