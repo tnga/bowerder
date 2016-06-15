@@ -10,6 +10,9 @@
     "less/font-awesome.less",
     "scss/font-awesome.scss"
   ],
+  "browser": {
+    "main": ["css/font-awesome.min.css"]
+  },
   "ignore": [
     "*/.*",
     "*.json",
