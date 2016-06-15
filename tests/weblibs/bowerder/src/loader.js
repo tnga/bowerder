@@ -491,11 +491,11 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
          // init the number of imported file counter for the package
          pkgConfig.browser.counter = 0;
 
-         /* minification is a way for developper to have for some files a better loading optimization. 
+         /* minification is a way for developer to have for some files a better loading optimization. 
           * however, `bower.json` spec do not allow to use minified files as mains files for a component.
           * developers use to set associated `main` property with sources or developments files.
           * considering how web projects are now build, that pratice isn't advantageous for browsers.
-          * indeed, set an `index.scss` or an unminified `index.js` file as main file isn't good for browsers to digest.
+          * indeed, set an `index.scss` or an unminified `index.js` files *(depending of size)* as main file isn't good for browsers to digest.
           * that why is now recommended to also set a `browser: {main: []}` properties for mains files that browsers can easly digest.
           * minified files with sourcemaps are specialy welcome in that case.
           * bowerder will use that properties to load component *in the DOM*; if they aren't set, it will use the `main` property. 
