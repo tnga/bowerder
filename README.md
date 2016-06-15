@@ -1,8 +1,8 @@
 ## bowerder
 > the bower components loader for browsers
 
+<p align="center"><img style="max-width: 100%" src="bowerder.png"></p>
 Easly Import your components or libraries installed via bower to your project.
-
 #### why shall i use it ?
 
  - If you pain to include bower components that require dependencies in your project, this is for you.
@@ -209,7 +209,7 @@ Some libraries don't have that problem since their main files are distributions 
    ],
    ```
 
-For others specifications or features, documentation isn't yet ready.
+For others specifications and features, documentation isn't yet ready.
 
 #### license MIT
 Copyright (c) since june-2016 [Tindo N. Arsel](mailto:devtnga@gmail.com)
