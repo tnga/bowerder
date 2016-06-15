@@ -28,7 +28,6 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "./weblibs",
     "test",
     "tests"
   ]
