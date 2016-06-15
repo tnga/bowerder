@@ -28,48 +28,46 @@ $ npm install -g bowerder
 
 #### how to use it ?
 
-Very easy!
+Very easy !
 ```html
 <!-- only ~10kb minified or ~3kb gzipped :) -->
 <script src="path-to-bower-components-dir/bowerder/dist/loader.min.js" data-bowerreg></script>
 ```
-have fun
-```html
-<scitpt>
-   bower.import('ijs') ;
-   bower.import('vue') ;
-   //with callback
-   bower.import('Materialize', function (err) {
-      
-      if (err.occured) {
-         //you can know if occured error is from bowerder or browser loading process ;)
-         console.error('Oops it seems like `Materialize` isn\'t fully loaded from:'+ err.from) ;
-         return null; // interruption 
-      }
-      
-      // everything is ok!
-      // materialize depends of jquery, so jquery will be automatically loaded ;)
-      
-      Materialize.toast('`Materialize` is loaded!', 5000);
-      $('.chips-initial').material_chip('data');
-      $('.modal-trigger').leanModal();
-   });
-   
-   // global execution when all packages are fully imported
-   bower.ready( function (err) {
-      
-      if (err.occured) {
+have fun ! *(components are loaded with their dependencies)*
+```js
+bower.import('ijs') ;
+bower.import('vue') ;
+//with callback
+bower.import('Materialize', function (err) {
+
+   if (err.occured) {
+      //you can know if occured error is from bowerder or browser loading process ;)
+      console.error('Oops it seems like `Materialize` isn\'t fully loaded from:'+ err.from) ;
+      return null; // interruption 
+   }
+
+   // everything is ok!
+   // materialize depends of jquery, so jquery will be automatically loaded ;)
+
+   Materialize.toast('`Materialize` is loaded!', 5000);
+   $('.chips-initial').material_chip('data');
+   $('.modal-trigger').leanModal();
+});
+
+// global execution when all packages are fully imported
+bower.ready( function (err) {
+
+   if (err.occured) {
       //you can know which package have occured an error and if it is from bowerder or browser loading process ;)
       if (err.fromBrowser) console.error('Oops it seems like: '+ err.fromBrowser.join(', ') +' occured a loading error from: browser');
       if (err.fromBowerder) console.error('Oops it seems like: '+ err.fromBowerder.join(', ') +' occured a loading error from: bowerder');
       return null; // interruption 
-      }
-            
-      Materialize.toast('everything is ok!', 5000);
-      $('#winner-modal').openModal();
-      iJS.animate($('#winner-modal')[0], 'shake', 15);
-   });
-</scitpt>
+   }
+
+   Materialize.toast('everything is ok!', 5000);
+   $('#winner-modal').openModal();
+   iJS.animate($('#winner-modal')[0], 'shake', 15);
+});
 ```
 
 You have a custom external scripts or stylesheets for your project which use or overwrite some packages's features ?
@@ -195,6 +193,7 @@ bowerder will use `browser: {main: []}` properties to load component's main file
 ```
 Some libraries don't have that problem since their main files are distributions files.
  - *[aos](http://github.com/michalsnik/aos)'s* `bower.json`
+ 
    ```json
    "main": [
       "dist/aos.js",
@@ -202,6 +201,7 @@ Some libraries don't have that problem since their main files are distributions 
    ],
    ```
  - *[reveal.js](http://github.com/hakimel/reveal.js)'s* `bower.json`
+ 
    ```json
    "main": [
       "js/reveal.js",
