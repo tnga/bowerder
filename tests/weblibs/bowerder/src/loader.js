@@ -1,10 +1,10 @@
-/* bower component loader for the browser
+/* the bower components loader for browsers
  ________________________________________________________________________________________
  *
  * Easly Import your components or libraries installed via bower to your project.
  * 
  * @license MIT
- * @author  [Tindo Ngoufo Arsel](mailto:devtnga@gmail.com)
+ * @author  [Tindo N. Arsel](mailto:devtnga@gmail.com)
 */
 
 // manage possible conflict with loader namespace definition.

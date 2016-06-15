@@ -6,7 +6,7 @@
  * The goal is to use that registries to easly import them on browsers
  * 
  * @license MIT
- * @author  [Tindo Ngoufo Arsel](mailto:devtnga@gmail.com)
+ * @author  [Tindo N. Arsel](mailto:devtnga@gmail.com)
 */
 
 var fs = require('fs');

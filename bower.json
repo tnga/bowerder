@@ -1,6 +1,6 @@
 {
   "name": "bowerder",
-  "description": "the bower component loader for browsers",
+  "description": "the bower components loader for browsers",
   "main": "src/loader.js",
   "browser": {
     "main": ["dist/loader.min.js"]

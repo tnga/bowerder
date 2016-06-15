@@ -3,6 +3,7 @@
 
 <p align="center"><img style="max-width: 100%" src="bowerder.png"></p>
 Easly Import your components or libraries installed via bower to your project.
+
 #### why shall i use it ?
 
  - If you pain to include bower components that require dependencies in your project, this is for you.
