@@ -72,7 +72,7 @@ bower.ready( function (err) {
 ```
 
 You have a custom external scripts or stylesheets for your project which use or overwrite some packages's features ?
-Don't worry, just simply include them and bowerder will import packages's main files before thier inclusions;
+Don't worry, just simply include them and bowerder will import packages's main files before their loading;
 so that it will be like you have done it by yourself.
 *(except it's without stress or question like "which package's main file i have forgot and where to include ?")*
 ```html
@@ -175,7 +175,7 @@ $ gulp watch
 
 Minification is a way for developer to have for some files a better loading optimization. However, `bower.json` spec do not allow to use minified files as mains files for a component.
 Developers use to set associated `main` property with sources or developments files. Considering how web projects are now build, that pratice isn't advantageous for browsers.
-Indeed, set an `index.scss`, `index.coffee` or an unminified `index.js` files *(depending of size)* for production as main files isn't good for browsers to digest.
+Indeed, set an `index.scss`, `index.coffee` or an unminified `index.js` files *(depending of size)* for production as main files isn't actually good for browsers to digest.
 That why bowerder now recommended to also set a `browser: {main: []}` properties for mains files that browsers can easly digest. Minified files with sourcemaps are specialy welcome in that case.
 
 > If you like this module, you can give it a star and try to *pull request* to some libraries's repository like [bootstrap](http://github.com/twbs/bootstrap) which don't yet respect that behavior.
