@@ -55,24 +55,24 @@ if (typeof bower !== 'undefined' && !(bower.components instanceof Object)) {
  * to better manage some stuff, the loader can set extras porperties through the `browser` object, which will be itself a property of the package's configuration object. 
 */
 
-bower.dir = './bower_components';      // bower base directory
-bower.devMode = false;      // development mode for more verbose in console
-bower.isRegStated = false;         // inform if the local registry state is logged or not
-bower.loadingCount = 0;   // number of package that are in loading process
-bower.total = 0;          // total number of packages that must to be loaded
-bower.callbacks = {};     // packages's callback functions registry 
-bower.packagesTree = [];  // packages's configuration registry
+bower.dir = './bower_components';  // bower base directory
+bower.devMode = false;             // development mode for more verbose in console
+bower.isRegStated = false;         // inform if the local registry state is notified (in console)
+bower.loadingCount = 0;            // number of package that are in loading process
+bower.total = 0;                   // total number of packages that must to be loaded
+bower.callbacks = {};              // packages's callback functions registry 
+bower.packagesTree = [];           // packages's configuration registry
 
 bower.cdn = {
-   usage: false,   // allow bower to use code deliver network (using online bower registry)
+   usage: false,   // allow bower to use code deliver network (using online bower's registry)
    rawgit: {}      // for rawgit cdn url of availables packages to load
 }
 
-bower.browser = {          // these properties will help in some case for bowerder global processing.
-   loaded: false,
-   regState: 0,         // inform about the local registry state (if it's provided or not)
-   regTag: undefined,    // reference to *local packages's registry* script tag
-   loaderTag: undefined, // reference to bowerder's script tag
+bower.browser = {         // these properties will help in some case for bowerder global processing.
+   loaded: false,         // inform if all given packages are fully imported
+   regState: 0,           // inform about the local registry state (if it's provided or not)
+   regTag: undefined,     // reference to *local packages's registry* script tag
+   loaderTag: undefined,  // reference to bowerder's script tag
    waitingCB: [],         // index of callbacks's to be execute after full packages's importation "in the DOM" 
    waitingImport: [],     // for package that will wait for *local packages's registry* state, before to be imported
    error: {occured: false, fromBrowser: [], fromBowerder: []},
@@ -470,7 +470,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
       
       
       /**
-       * search package from online bower registry and parse resulting informations that can help for loading process. 
+       * search package from online bower's registry and parse resulting informations that can help for loading process. 
        * @param {string}   pkgName  the name of a package
        * @param {function} callback the function to execute after the end of request process. take the resulting rawgit url as argument 
        */
