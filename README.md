@@ -104,8 +104,8 @@ To avoid to run that command each time you make a bower operation (install, upda
 $ bowerder auto
 ```
 
-It's possible to load your bower packages via **online CDN service**. This is usefull for projects which don't provide local hosted dependecies *(codepen, jsfiddle, online demo, ...)*.
-For that purpose, just enable the `bower.cdn.usage` property. The actual CDN use by the loader is [cdn.rawgit.com](https://cdn.rawgit.com). That will cause online package's loading method to have priority to local loading.
+It's possible to load your bower packages via **online CDN service**. This is usefull for projects which don't provide local hosted dependencies *(codepen, jsfiddle, online demo, ...)*.
+For that purpose, just enable the `bower.cdn.usage` property. The actual CDN use by the loader is [cdn.rawgit.com](https://rawgit.com). That will cause online package's loading method to have priority to local loading.
 One of advantages of this functionality is the possibility to switch from local hosted dependencies to online hosting and vis versa, without change concerned code in a associated project.
 ```js
 bower.cdn.usage = true ;
