@@ -52,7 +52,14 @@ if (typeof bower !== 'undefined' && !(bower.components instanceof Object)) {
  * `fromBowerder` : an array which inform about packages where error occured and if it was from "bowerder" loading operations;
  *    therefore, console is the place to see what really happen.
  *    
- * to better manage some stuff, the loader can set extras porperties through the `browser` object, which will be itself a property of the package's configuration object. 
+ * to better manage some stuff, the loader can set extras porperties through the `browser` object, which can be itself a property of the package's configuration object. 
+ * 
+ * packages can be loaded from online CDN service like **cdn.rawgit.com**.
+ * that said, only packages present in the bower's registry are targets.
+ * to make this possible, developer have to enable the `bower.cdn.usage` property.
+ * therefore online package's loading method will have priority to local loading.
+ * one of advantages of this functionality is the possibility to switch from local hosted dependencies to online hosting via cdn and vis versa,
+ * without change concerned code in a associated project.
 */
 
 bower.dir = './bower_components';  // bower base directory
