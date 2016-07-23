@@ -56,14 +56,14 @@ if (typeof bower !== 'undefined' && !(bower.components instanceof Object)) {
 */
 
 bower.dir = './bower_components';      // bower base directory
-bower.devMode = false;      // bower base directory
+bower.devMode = false;      // development mode for more verbose in console
 bower.loadingCount = 0;   // number of package that are in loading process
 bower.total = 0;          // total number of packages that must to be loaded
 bower.callbacks = {};     // packages's callback functions registry 
 bower.packagesTree = [];  // packages's configuration registry
 
 bower.cdn = {
-   usage: false, // allow bower to use code deliver network (using online bower registry)
+   usage: false,   // allow bower to use code deliver network (using online bower registry)
    rawgit: {}      // for rawgit cdn url of availables packages to load
 }
 
@@ -215,7 +215,7 @@ bower.checkCallback = function (pkgName) {
          });
       }
 
-      //will check if all packages are fully imported for global callbacks's executions
+      // will check if all packages are fully imported (condition is good) for globals callbacks's executions
       bower.ready(); 
    }
 }
@@ -279,40 +279,29 @@ bower.attachPackageCB = function (node, pkgName) {
    }
 
    // Set up load listener. Test attachEvent first because IE9 has
-   // a subtle issue in its addEventListener and script onload firings
-   // that do not match the behavior of all other browsers with
-   // addEventListener support, which fire the onload event for a
-   // script right after the script execution. See:
+   // a subtle issue in its addEventListener and script onload firings that do not match the behavior of all other browsers with
+   // addEventListener support, which fire the onload event for a script right after the script execution. See:
    // https://connect.microsoft.com/IE/feedback/details/648057/script-onload-event-is-not-fired-immediately-after-script-execution
-   // UNFORTUNATELY Opera implements attachEvent but does not follow the script
-   // script execution mode.
+   // UNFORTUNATELY Opera implements attachEvent but does not follow the script execution mode.
    if (node.attachEvent &&
-       // Check if node.attachEvent is artificially added by custom script or
-       // natively supported by browser
+       // Check if node.attachEvent is artificially added by custom script or natively supported by browser
        // read https://github.com/requirejs/requirejs/issues/187
        // if we can NOT find [native code] then it must NOT natively supported.
        // in IE8, node.attachEvent does not have toString()
-       // Note the test for "[native code" with no closing brace, see:
-       // https://github.com/requirejs/requirejs/issues/273
+       // Note the test for "[native code" with no closing brace, see: https://github.com/requirejs/requirejs/issues/273
        !(node.attachEvent.toString && node.attachEvent.toString().indexOf('[native code') < 0) &&
        !isOpera) {
-      // Probably IE. IE (at least 6-8) do not fire
-      // script onload right after executing the script, so
+      // Probably IE. IE (at least 6-8) do not fire script onload right after executing the script, so
       // we cannot tie the anonymous define call to a name.
-      // However, IE reports the script as being in 'interactive'
-      // readyState at the time of the define call.
+      // However, IE reports the script as being in 'interactive' readyState at the time of the define call.
 
       node.attachEvent('onreadystatechange', function () { bower.checkCallback( pkgName ); });
-      // It would be great to add an error handler here to catch
-      // 404s in IE9+. However, onreadystatechange will fire before
-      // the error handler, so that does not help. If addEventListener
-      // is used, then IE will fire error before load, but we cannot
-      // use that pathway given the connect.microsoft.com issue
-      // mentioned above about not doing the 'script execute,
-      // then fire the script load event listener before execute
-      // next script' that other browsers do.
-      // Best hope: IE10 fixes the issues,
-      // and then destroys all installs of IE 6-9.
+      // It would be great to add an error handler here to catch 404s in IE9+. 
+      // However, onreadystatechange will fire before the error handler, so that does not help. 
+      // If addEventListener is used, then IE will fire error before load, but we cannot
+      // use that pathway given the connect.microsoft.com issue mentioned above about not doing the 'script execute,
+      // then fire the script load event listener before execute next script' that other browsers do.
+      // Best hope: IE10 fixes the issues, and then destroys all installs of IE 6-9.
       // node.attachEvent('onerror', context.onScriptError);
    } else {
 
@@ -423,7 +412,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
          var pkgConfig = bower.components[ pkgName ];
          /* for reason due to size some properties in `bower.json` have been deleted with provided local registry (using bowerder on command line).
           * `name` is one of them, and the reason of it was removed was to avoid duplication since as once can see, package's configuration is accessible with package's name.
-          * this is valable for `bower.components` (local registry), but not for `bower.packagesTree` (import registry), which need that `name` property to be set.
+          * this is valable for `bower.components` (local registry), but not for `bower.packagesTree` (particular generated registry), which need that `name` property to be set.
          */
          pkgConfig.name = pkgName;
 
@@ -477,7 +466,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
 
                   if (/^https:\/\/github.com/i.test( pkgInfos.repository_url )) {
 
-                     //@TODO remove this test hack and only consider the else instruction when jquery's search will result to appropriate repository (https://github.com/jquery/jquery-dist)
+                     // @TODO remove this test hack and only consider the else instruction when jquery's search will result to appropriate repository (https://github.com/jquery/jquery-dist)
                      if (pkgName === 'jquery') {
                         bower.cdn.rawgit[ pkgName ] = 'https://cdn.rawgit.com/'+ pkgInfos.repository_url.replace('https://github.com/', '') +'-dist' +'/'+ ((pkgInfos.latest_release_number) ? pkgInfos.latest_release_number : 'master');
                      }
