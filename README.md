@@ -10,7 +10,7 @@ Easly Import your components or libraries installed via bower to your project.
  - if you have difficulty to show how to include your module pushed to bower registry, considering it dependencies, this is for you.
  - if you care about how many time a component will be included to your project considering work's subdivision and module's inclusion here and there, this is for you.
  
-Indeed, [**bower**]( http://bower.io) is the package manager, but without a good loader's utility, package's dependency and module philosophy are under-exploited with usage of a simple `script` or `link` tag.
+Indeed, [**bower**](http://bower.io) is the package manager, but without a good loader's utility, package's dependency and module philosophy are under-exploited with usage of a simple `script` or `link` tag.
 A best example to explain what i'm talking about is the comparison with node modules usage. 
 Although conditions are a little differents, here is a place to better manage component we use through bower in our project.
  
@@ -31,7 +31,7 @@ $ npm install -g bowerder
 
 Very easy !
 ```html
-<!-- only ~10kb minified or ~3kb gzipped :) -->
+<!-- only ~11kb minified or ~3kb gzipped :) -->
 <script src="path-to-bower-components-dir/bowerder/dist/loader.min.js" data-bowerreg></script>
 ```
 have fun ! *(components are loaded with their dependencies)*
@@ -103,8 +103,23 @@ To avoid to run that command each time you make a bower operation (install, upda
 ```sh
 $ bowerder auto
 ```
-With the browser, packages's configurations can be access via the `bower.components` properties; and imported packages's tree dependencies via the `bower.packagesTree` properties.
 
+It's possible to load your bower packages via **online CDN service**. This is usefull for projects which don't provide local hosted dependecies *(codepen, jsfiddle, online demo, ...)*.
+For that purpose, just enable the `bower.cdn.usage` property. The actual CDN use by the loader is [cdn.rawgit.com](https://cdn.rawgit.com). That will cause online package's loading method to have priority to local loading.
+One of advantages of this functionality is the possibility to switch from local hosted dependencies to online hosting and vis versa, without change concerned code in a associated project.
+```js
+bower.cdn.usage = true ;
+
+bower.import("vue") ;
+bower.import("d3") ;
+bower.import("aos") ;
+
+bower.ready( function (err) {
+
+   alert("after all previous importation. [error: "+ err.occured +"]") ;
+}) ;
+```
+In the browser, packages's configurations can be access via the `bower.components` properties; and imported packages's tree dependencies via the `bower.packagesTree` properties.
 What about to give more informations about libraries that powered a project ?
 ```js
 bower.ready( function (err) {
@@ -140,14 +155,17 @@ bower.ready( function (err) {
 When the local registry isn't available or updated, bowerder will try to load packages through Ajax API; which can play on expected performances. 
 The `data-bowerreg` attribute in the bowerder's script tag also contribute to the magic; without it, 
 developer will have to manually include the local registry and set the bower components directory of the project.
-```html
-<script>
+```js
    bower.dir = 'path-to-bower-components-dir';
-</script>
 ```
 
-I plan to provide a benchmark for comparison with commonly use method, but it's isn't yet ready due to time. However, bowerder way is simple and fastest.
-For those who think that concatation of their modules's main files in big one is the only way to really optimize loading on browsers have to note that it is disputable;
+Enable the *development mode* is recommended if you want all print's trace of the loading process's warnings/errors.
+```js
+bower.devMode = true;
+```
+
+Bowerder way is simple. Except the usage of feature like `import` provided by es6-next, for those who think that, 
+concatanation of their modules's main files in big one is the only way to really optimize loading on browsers have to note that it is disputable;
 specially in development purpose. Ask yourself why best download manager use to download file in mutiple sub-parts even if that implies more requests to send.
 Likewise, server can be configured to send compressed files to client so that transactions become faster. Even if one time download can be a solution, 
 it can have a little negative influence on pages rendering process.
