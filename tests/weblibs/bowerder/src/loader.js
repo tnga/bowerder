@@ -54,7 +54,7 @@ if (typeof bower !== 'undefined' && !(bower.components instanceof Object)) {
  *    
  * to better manage some stuff, the loader can set extras porperties through the `browser` object, which can be itself a property of the package's configuration object. 
  * 
- * packages can be loaded from online CDN service like **cdn.rawgit.com**.
+ * packages can be loaded from online CDN service like [cdn.rawgit.com](https://rawgit.com).
  * that said, only packages present in the bower's registry are targets.
  * to make this possible, developer have to enable the `bower.cdn.usage` property.
  * therefore online package's loading method will have priority to local loading.
