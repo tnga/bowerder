@@ -57,6 +57,7 @@ if (typeof bower !== 'undefined' && !(bower.components instanceof Object)) {
 
 bower.dir = './bower_components';      // bower base directory
 bower.devMode = false;      // development mode for more verbose in console
+bower.isRegStated = false;         // inform if the local registry state is logged or not
 bower.loadingCount = 0;   // number of package that are in loading process
 bower.total = 0;          // total number of packages that must to be loaded
 bower.callbacks = {};     // packages's callback functions registry 
@@ -69,6 +70,7 @@ bower.cdn = {
 
 bower.browser = {          // these properties will help in some case for bowerder global processing.
    loaded: false,
+   regState: 0,         // inform about the local registry state (if it's provided or not)
    regTag: undefined,    // reference to *local packages's registry* script tag
    loaderTag: undefined, // reference to bowerder's script tag
    waitingCB: [],         // index of callbacks's to be execute after full packages's importation "in the DOM" 
@@ -404,6 +406,24 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
    
    if (!isAlreadyOk) { // process the adding operation to the registry.
 
+      // log (if isn't already done) the state of local registry if it isn't provided or well defined
+      if (bower.devMode && !(bower.components instanceof Object) && !bower.isRegStated) {
+
+         switch (bower.browser.regState) {
+            case 1:
+               console.warn('bowerder: local registry isn\'t found, loader will try to import package through Ajax API.');
+               break;
+            case 2:
+               console.warn('bowerder: seems that local registry isn\'t provided; if so, loader will try to import package through Ajax API.');
+               break;
+            default:
+               console.warn('bowerder: unexpected state of local registry; loader will try to import package through Ajax API.');
+               break;
+         }
+         
+         bower.isRegStated = true ;
+      }
+      
       bower.loadingCount++;
       bower.total++;
 
@@ -718,7 +738,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                            */
                            if (getTag.fext !== "css") {
 
-                              console.warn("bowerder: can't attach callback to `onload` event of "+ pkg.name +"/"+ pkg.browser.main[ index ]);
+                              if (bower.devMode) console.warn("bowerder: can't attach callback to `onload` event of "+ pkg.name +"/"+ pkg.browser.main[ index ]);
                               bower.checkCallback( pkg.name );
                            }
                            else bower.attachPackageCB( loaderTag, pkg.name );
@@ -894,7 +914,7 @@ if (bower.components === undefined) {
          if (!(bower.components instanceof Object)) {
 
             bower.components = null; // will allow not already run import's function call to skip waiting import step
-            console.warn('bowerder: local registry isn\'t found, loader will try to import package through Ajax API.');
+            bower.browser.regState = 1; // local registry isn't found, maybe is provided but isn't well defined
          }
 
          bower.browser.waitingImport.forEach( function (pkgInfo) {
@@ -913,6 +933,6 @@ if (bower.components === undefined) {
    else {
 
       bower.components = null; // will allow not already run import's function call to skip waiting import step
-      console.warn('bowerder: seems that local registry isn\'t provided; if so, loader will try to import package through Ajax API.');
+      bower.browser.regState = 2; // local registry isn't provided
    }
 }
