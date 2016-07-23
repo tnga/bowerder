@@ -271,6 +271,8 @@ bower.ready = function (callback) {
 
          bower.callbacks['#bowerder'][cbIndex]( bower.browser.error );
       });
+      // clean up (considering each callback have to be executed once)
+      bower.browser.waitingCB = [];
    }
 };  
 
