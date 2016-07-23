@@ -37,6 +37,7 @@
       
       //bower.dir = "weblibs"
       bower.devMode = true ;
+      //bower.cdn.usage = true ;
       bower.import("bootstrap" , function (err) {alert("bootstrap [error: "+ err.occured +"]");}) ;
       bower.import("reveal.js", function (err) {alert("reveal [error: "+ err.occured +"]");}) ;
       bower.import("font-awesome", function (err) {alert("font-awesome [error: "+ err.occured +"]");}) ;
@@ -51,14 +52,14 @@
       bower.ready( function (err) {
         
         alert("after all previous importation. [error: "+ err.occured +"]") ;
+        
+        setTimeout(function() {
+
+          bower.import("ijs", function (err) {alert("ijs after already imported [error: "+ err.occured +"]");}) ;
+
+          $("span").text("...unique importation") ;
+        }, 5000);
       }) ;
-      
-      setTimeout(function() {
-        
-        bower.import("ijs", function (err) {alert("ijs after already imported [error: "+ err.occured +"]");}) ;
-        
-        $("span").text("...unique importation") ;
-      }, 5000);
     </script>
 
   </body>

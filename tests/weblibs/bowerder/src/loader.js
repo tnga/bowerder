@@ -62,6 +62,11 @@ bower.total = 0;          // total number of packages that must to be loaded
 bower.callbacks = {};     // packages's callback functions registry 
 bower.packagesTree = [];  // packages's configuration registry
 
+bower.cdn = {
+   usage: false, // allow bower to use code deliver network (using online bower registry)
+   rawgit: {}      // for rawgit cdn url of availables packages to load
+}
+
 bower.browser = {          // these properties will help in some case for bowerder global processing.
    loaded: false,
    regTag: undefined,    // reference to *local packages's registry* script tag
@@ -407,14 +412,14 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
          if (bower.packageIndex( pkgCaller ) < bower.packageIndex( pkgName )) isAlreadyOk = false;
       }
    }
-
+   
    if (!isAlreadyOk) { // process the adding operation to the registry.
 
       bower.loadingCount++;
       bower.total++;
 
       if ((bower.components instanceof Object) && bower.components[ pkgName ]) {
-
+        
          var pkgConfig = bower.components[ pkgName ];
          /* for reason due to size some properties in `bower.json` have been deleted with provided local registry (using bowerder on command line).
           * `name` is one of them, and the reason of it was removed was to avoid duplication since as once can see, package's configuration is accessible with package's name.
@@ -423,8 +428,15 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
          pkgConfig.name = pkgName;
 
          loadPackageConfig( pkgConfig );
-
-         checkReadyToImport();
+         
+         if (bower.cdn.usage) {
+            
+            fetchPackage( pkgName, function () {
+               
+               checkReadyToImport(); 
+            });
+         }
+         else checkReadyToImport();
       }
       else {
 
@@ -433,7 +445,57 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
             console.warn("bowerder:addPackage: can't found `"+ pkgName +"` in project's local registry; will try to import package through Ajax API.");
          }
 
-         bower.xhrGet( bower.dir +'/'+ pkgName +'/bower.json', true, function (reponse) {
+         var pkgConfigURL = bower.dir +'/'+ pkgName +'/bower.json';
+         
+         if (bower.cdn.usage) {
+            
+            fetchPackage( pkgName, function (rawgitURL) {
+                
+               if (rawgitURL) pkgConfigURL = rawgitURL + '/bower.json';
+               
+               getPackageConfig( pkgConfigURL );
+            });
+         }
+         else getPackageConfig( pkgConfigURL );
+      }
+      
+      
+      /**
+       * search package from online bower registry and parse resulting informations that can help for loading process. 
+       * @param {string}   pkgName  the name of a package
+       * @param {function} callback the function to execute after the end of request process. take the resulting rawgit url as argument 
+       */
+      function fetchPackage( pkgName, callback) {
+                  
+         bower.xhrGet('https://libraries.io/api/bower/'+ pkgName, true, function (reponse) {
+
+            if (!reponse.error) {
+
+               var pkgInfos = JSON.parse( reponse.text ); 
+               
+               if (pkgInfos instanceof Object) {
+
+                  if (/^https:\/\/github.com/i.test( pkgInfos.repository_url )) {
+
+                     bower.cdn.rawgit[ pkgName ] = 'https://cdn.rawgit.com/'+ pkgInfos.repository_url.replace('https://github.com/', '') +'/'+ ((pkgInfos.latest_release_number) ? pkgInfos.latest_release_number : 'master');
+                  }
+                  else console.warn('bowerder:addPackage: can\'t yet able to load `'+ pkgName +'` from '+ pkgInfos[i].repository_url +' repository.' );
+               }
+               else console.warn('bowerder:addPackage: invalid loaded meta-data of `'+ pkgName +'`.' );
+            }
+            else console.error('bowerder:addPackage: unable to find `'+ pkgName +'` from online registry.' );  
+            
+            if (callback) callback( bower.cdn.rawgit[ pkgName ] );
+         });
+      }
+      
+      /**
+       * locally get and parse a `bower.json` config file of a package
+       * @param {string} jsonURL url where to get the `bower.json` of a package
+       */
+      function getPackageConfig (jsonURL) {
+         
+         bower.xhrGet( jsonURL, true, function (reponse) {
 
             if (reponse.error) {
 
@@ -641,7 +703,11 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                            */
                            bower.attachPackageCB( loaderTag, pkg.name );
 
-                           loaderTag.src = bower.dir +'/'+ pkg.name +'/'+ pkg.browser.main[ index ];
+                           if (bower.cdn.usage && bower.cdn.rawgit[ pkg.name ]) {
+                              
+                              loaderTag.src = bower.cdn.rawgit[ pkg.name ] +'/'+ pkg.browser.main[ index ];
+                           }
+                           else loaderTag.src = bower.dir +'/'+ pkg.name +'/'+ pkg.browser.main[ index ];
 
                            pkgScriptTags.push( loaderTag );
                         }
@@ -664,7 +730,11 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                            }
                            else bower.attachPackageCB( loaderTag, pkg.name );
 
-                           loaderTag.href = bower.dir +'/'+ pkg.name +'/'+ pkg.browser.main[ index ];
+                           if (bower.cdn.usage && bower.cdn.rawgit[ pkg.name ]) {
+
+                              loaderTag.href = bower.cdn.rawgit[ pkg.name ] +'/'+ pkg.browser.main[ index ];
+                           }
+                           else loaderTag.href = bower.dir +'/'+ pkg.name +'/'+ pkg.browser.main[ index ];
 
                            pkgLinkTags.push( loaderTag );
                         }  
