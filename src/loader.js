@@ -475,7 +475,8 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
        * @param {function} callback the function to execute after the end of request process. take the resulting rawgit url as argument 
        */
       function fetchPackage( pkgName, callback) {
-                  
+
+         // @TODO change this hack to get `bower.json`'s package directly from bower's registry (if it's better)
          bower.xhrGet('https://libraries.io/api/bower/'+ pkgName, true, function (reponse) {
 
             if (!reponse.error) {
