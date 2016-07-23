@@ -477,7 +477,11 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
 
                   if (/^https:\/\/github.com/i.test( pkgInfos.repository_url )) {
 
-                     bower.cdn.rawgit[ pkgName ] = 'https://cdn.rawgit.com/'+ pkgInfos.repository_url.replace('https://github.com/', '') +'/'+ ((pkgInfos.latest_release_number) ? pkgInfos.latest_release_number : 'master');
+                     //@TODO remove this test hack and only consider the else instruction when jquery's search will result to appropriate repository (https://github.com/jquery/jquery-dist)
+                     if (pkgName === 'jquery') {
+                        bower.cdn.rawgit[ pkgName ] = 'https://cdn.rawgit.com/'+ pkgInfos.repository_url.replace('https://github.com/', '') +'-dist' +'/'+ ((pkgInfos.latest_release_number) ? pkgInfos.latest_release_number : 'master');
+                     }
+                     else bower.cdn.rawgit[ pkgName ] = 'https://cdn.rawgit.com/'+ pkgInfos.repository_url.replace('https://github.com/', '') +'/'+ ((pkgInfos.latest_release_number) ? pkgInfos.latest_release_number : 'master');
                   }
                   else console.warn('bowerder:addPackage: can\'t yet able to load `'+ pkgName +'` from '+ pkgInfos[i].repository_url +' repository.' );
                }
