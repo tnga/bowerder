@@ -38,9 +38,10 @@
       //bower.dir = "weblibs"
       bower.devMode = true ;
       bower.cdn.usage = true ;
+      
       //bootstrap depend of jquery, so this line isn't needed.
       //this is to show flexibility in case of duplicate component's importation.
-      bower.import("bootstrap" , function (err) {alert("bootstrap [error: "+ err.occured +"]");}) ;
+      bower.import("bootstrap#3.3.7" , function (err) {alert("bootstrap [error: "+ err.occured +"]");}) ;
       bower.import("reveal.js", function (err) {alert("reveal [error: "+ err.occured +"]");}) ;
       bower.import("font-awesome", function (err) {alert("font-awesome [error: "+ err.occured +"]");}) ;
       bower.import("ijs", function (err) {alert("ijs [error: "+ err.occured +"]");}) ;

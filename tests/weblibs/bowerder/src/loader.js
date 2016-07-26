@@ -372,8 +372,10 @@ bower.parseTagType = function (targetFile) {
 /**
  * organize packages's tree dependencies, process their importation "in the DOM" with asssociated callback if available
  * @param   {string}   pkgName   package's name
- * @param   {string}   pkgCaller package's of package which depends of first (argument) given package. usefull for dependencies management.
- * @param   {number}   cbIndex   index of current associated callback in callbacks's registry (if given)
+ * @param   {object}   opts associated options for importation process:
+ *                           `caller`: package which depends of this (argument focused by `pkgName`) given package. usefull for dependencies management,
+ *                          `version`: target package's version to load (only considered for online loading through CDN),
+ *                              `cbi`: index of current associated callback in callbacks's registry (if given)
  */
 bower.addPackage = function (pkgName, opts) {
 
@@ -511,15 +513,15 @@ bower.addPackage = function (pkgName, opts) {
       /**
        * search package from online bower's registry and parse resulting informations that can help for loading process. 
        * @param {string}   pkgName  the name of a package
+       * @param {string}   pkgVersion  the package's version
        * @param {function} callback the function to execute after the end of request process. take the resulting rawgit url as argument 
        */
       function fetchPackage( pkgName, pkgVersion, callback) {
 
          // @TODO change this hack to get `bower.json`'s package directly from bower's registry (if it's better)
          // @TODO the package's versionn or range version will be send to the futur `bowerder api` that will determine the appropiate versoin to load (v0.5.0)
+         // @NOTE considering the previous to do, hope this hack will not be necessary with the futur online package's loading implementation from v0.5.0 
          bower.xhrGet('https://libraries.io/api/bower/'+ pkgName, true, function (reponse) {
-
-            var isLatestNeeded = false;
             
             if (!reponse.error) {
 
@@ -531,7 +533,6 @@ bower.addPackage = function (pkgName, opts) {
 
                      pkgVersion = simplifySemVer( pkgVersion ) || pkgInfos.latest_release_number || 'master';
                      if (/^v/.test( pkgInfos.latest_release_number ) && /^\d/.test( pkgVersion )) pkgVersion = 'v' + pkgVersion;
-                     if (pkgVersion === pkgInfos.latest_release_number) isLatestNeeded = true;
                      // @TODO remove this test hack and only consider the else instruction when jquery's search will result to appropriate repository (https://github.com/jquery/jquery-dist)
                      if (pkgName === 'jquery') {
                         bower.cdn.rawgit[ pkgName ] = 'https://cdn.rawgit.com/'+ pkgInfos.repository_url.replace('https://github.com/', '') +'-dist' +'/'+ pkgVersion;
@@ -544,18 +545,7 @@ bower.addPackage = function (pkgName, opts) {
             }
             else console.error('bowerder:addPackage: unable to find `'+ pkgName +'` from online registry.' );  
             
-            if (callback) {
-               
-               if (isLatestNeeded) {
-                  /* there are libraries that have included `bower.json` after their latest release.
-                   * this cause the configuration not available when target that version or lower.
-                   * however, it's generally available from master.
-                   * @NOTE hope this hack will not be necessary with the futur online package's loading implementation from v0.5.0 
-                   */
-                  callback( bower.cdn.rawgit[ pkgName ].replace( pkgVersion, 'master') );
-               }
-               else callback( bower.cdn.rawgit[ pkgName ] );
-            }
+            if (callback) callback( bower.cdn.rawgit[ pkgName ] );
          });
       }
       
