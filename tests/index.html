@@ -27,7 +27,7 @@
     <span>...waiting for duplicate import...</span>
     
     
-    <script src="weblibs/bowerder/src/loader.js" data-bowerreg></script>
+    <script src="weblibs/bowerder/src/loader.js" ></script>
     <!--<script src="weblibs/.bowerreg.js"></script>-->
     <script>
       bower.ready( function (err) {
@@ -37,16 +37,14 @@
       
       //bower.dir = "weblibs"
       bower.devMode = true ;
-      //bower.cdn.usage = true ;
+      bower.cdn.usage = true ;
+      //bootstrap depend of jquery, so this line isn't needed.
+      //this is to show flexibility in case of duplicate component's importation.
       bower.import("bootstrap" , function (err) {alert("bootstrap [error: "+ err.occured +"]");}) ;
       bower.import("reveal.js", function (err) {alert("reveal [error: "+ err.occured +"]");}) ;
       bower.import("font-awesome", function (err) {alert("font-awesome [error: "+ err.occured +"]");}) ;
       bower.import("ijs", function (err) {alert("ijs [error: "+ err.occured +"]");}) ;
       bower.import("aos") ;
-      
-      //bootstrap depend of jquery, so this line isn't needed.
-      //this is to show flexibility in case of duplicate component's importation.
-      bower.import("jquery") ;
       
       //see how this can be called after some group of import in which given global callback depend of.
       bower.ready( function (err) {

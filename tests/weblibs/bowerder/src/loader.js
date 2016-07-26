@@ -267,9 +267,9 @@ bower.ready = function (callback) {
 
    if (bower.browser.loaded) {
 
-      bower.browser.waitingCB.forEach( function (cbIndex) {
+      bower.browser.waitingCB.forEach( function (cbi) {
 
-         bower.callbacks['#bowerder'][cbIndex]( bower.browser.error );
+         bower.callbacks['#bowerder'][cbi]( bower.browser.error );
       });
       // clean up (considering each callback have to be executed once)
       bower.browser.waitingCB = [];
@@ -375,16 +375,25 @@ bower.parseTagType = function (targetFile) {
  * @param   {string}   pkgCaller package's of package which depends of first (argument) given package. usefull for dependencies management.
  * @param   {number}   cbIndex   index of current associated callback in callbacks's registry (if given)
  */
-bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
+bower.addPackage = function (pkgName, opts) {
 
    if (typeof pkgName !== 'string' && !(pkgName instanceof String)) {
 
       console.error("bowerder:addPackage: package's name must be a string");
       return null;
    }
-   if (pkgCaller && (typeof pkgCaller !== 'string') && !(pkgCaller instanceof String)) console.warn("bowerder:addPackage: package caller's name must be a string");
-   if (cbIndex && (typeof cbIndex !== 'number') && !(cbIndex instanceof Number)) console.warn("bowerder:addPackage: callback index must be a number");
-
+   if (opts && opts instanceof Object) {
+      
+      if (opts.caller && (typeof opts.caller !== 'string') && !(opts.caller instanceof String)) console.warn("bowerder:addPackage: package caller's name must be a string");
+      if (opts.version && (typeof opts.version !== 'string') && !(opts.version instanceof String)) console.warn("bowerder:addPackage: package's version must be a string");
+      if (opts.cbi && (typeof opts.cbi !== 'number') && !(opts.cbi instanceof Number)) console.warn("bowerder:addPackage: callback index must be a number");
+   } 
+   else if (opts && !(opts instanceof Object)) {
+      
+      console.error("bowerder:addPackage: package's options must be an object");
+      return null;
+   }
+   
    var isAlreadyOk = false;
 
    /* check if package to load is already present in the registry.
@@ -396,20 +405,20 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
       isAlreadyOk = true;
 
       // if the package is already fully loaded *in the DOM*, the current associated callback is executed.
-      if (cbIndex && bower.package( pkgName ).browser.loaded && bower.callbacks[ pkgName ]) {
+      if (opts.cbi && bower.package( pkgName ).browser.loaded && bower.callbacks[ pkgName ]) {
 
-         bower.callbacks[ pkgName ][cbIndex]( bower.package( pkgName ).browser.error );
+         bower.callbacks[ pkgName ][opts.cbi]( bower.package( pkgName ).browser.error );
       }
 
-      if (pkgCaller && (bower.packageIndex( pkgCaller ) != -1) ) {
+      if (opts.caller && (bower.packageIndex( opts.caller ) != -1) ) {
          /* major browsers load and execute script included by another script asynchronously.
           * the problem here is that, package which have dependencies have to be execute after them.
           * therefore, for these package, it's primordial to load them synchronously.
          */
          bower.package( pkgName ).browser.async = false;
-         bower.package( pkgCaller ).browser.async = false;
+         bower.package( opts.caller ).browser.async = false;
 
-         if (bower.packageIndex( pkgCaller ) < bower.packageIndex( pkgName )) isAlreadyOk = false;
+         if (bower.packageIndex( opts.caller ) < bower.packageIndex( pkgName )) isAlreadyOk = false;
       }
    }
    
@@ -449,7 +458,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
          
          if (bower.cdn.usage) {
             
-            fetchPackage( pkgName, function () {
+            fetchPackage( pkgName, opts.version, function () {
                
                checkReadyToImport(); 
             });
@@ -467,7 +476,7 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
          
          if (bower.cdn.usage) {
             
-            fetchPackage( pkgName, function (rawgitURL) {
+            fetchPackage( pkgName, opts.version, function (rawgitURL) {
                 
                if (rawgitURL) pkgConfigURL = rawgitURL + '/bower.json';
                
@@ -479,15 +488,39 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
       
       
       /**
+       * get a simplified version from a given range sementic version (see https://github.com/npm/node-semver)
+       * @param   {string}   semVer a valid range sementic version
+       * @returns {string} simplified version
+       */
+      function simplifySemVer (semVer) {
+         
+         if (semVer) {
+            // delete particular range operator and get a static version
+            if (/^\D\d/.test( semVer )) semVer = semVer.substring(1);
+            if (semVer.indexOf(' - ') !== -1) semVer = semVer.split(' - ')[1];
+            semVer = semVer.replace(' ', '');
+            if (/^\d\.\d$/.test( semVer )) semVer += '.0';
+            if (semVer.indexOf('.') === -1) semVer += '.0.0';
+            
+            if (!/^\d\.\d/.test( semVer )) console.warn('bowerder:addPackage: invalid sementic version: '+ semVer);
+         }
+         
+         return semVer;
+      }
+      
+      /**
        * search package from online bower's registry and parse resulting informations that can help for loading process. 
        * @param {string}   pkgName  the name of a package
        * @param {function} callback the function to execute after the end of request process. take the resulting rawgit url as argument 
        */
-      function fetchPackage( pkgName, callback) {
+      function fetchPackage( pkgName, pkgVersion, callback) {
 
          // @TODO change this hack to get `bower.json`'s package directly from bower's registry (if it's better)
+         // @TODO the package's versionn or range version will be send to the futur `bowerder api` that will determine the appropiate versoin to load (v0.5.0)
          bower.xhrGet('https://libraries.io/api/bower/'+ pkgName, true, function (reponse) {
 
+            var isLatestNeeded = false;
+            
             if (!reponse.error) {
 
                var pkgInfos = JSON.parse( reponse.text ); 
@@ -496,11 +529,14 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
 
                   if (/^https:\/\/github.com/i.test( pkgInfos.repository_url )) {
 
+                     pkgVersion = simplifySemVer( pkgVersion ) || pkgInfos.latest_release_number || 'master';
+                     if (/^v/.test( pkgInfos.latest_release_number ) && /^\d/.test( pkgVersion )) pkgVersion = 'v' + pkgVersion;
+                     if (pkgVersion === pkgInfos.latest_release_number) isLatestNeeded = true;
                      // @TODO remove this test hack and only consider the else instruction when jquery's search will result to appropriate repository (https://github.com/jquery/jquery-dist)
                      if (pkgName === 'jquery') {
-                        bower.cdn.rawgit[ pkgName ] = 'https://cdn.rawgit.com/'+ pkgInfos.repository_url.replace('https://github.com/', '') +'-dist' +'/'+ ((pkgInfos.latest_release_number) ? pkgInfos.latest_release_number : 'master');
+                        bower.cdn.rawgit[ pkgName ] = 'https://cdn.rawgit.com/'+ pkgInfos.repository_url.replace('https://github.com/', '') +'-dist' +'/'+ pkgVersion;
                      }
-                     else bower.cdn.rawgit[ pkgName ] = 'https://cdn.rawgit.com/'+ pkgInfos.repository_url.replace('https://github.com/', '') +'/'+ ((pkgInfos.latest_release_number) ? pkgInfos.latest_release_number : 'master');
+                     else bower.cdn.rawgit[ pkgName ] = 'https://cdn.rawgit.com/'+ pkgInfos.repository_url.replace('https://github.com/', '') +'/'+ pkgVersion;
                   }
                   else console.warn('bowerder:addPackage: can\'t yet able to load `'+ pkgName +'` from '+ pkgInfos[i].repository_url +' repository.' );
                }
@@ -508,7 +544,18 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
             }
             else console.error('bowerder:addPackage: unable to find `'+ pkgName +'` from online registry.' );  
             
-            if (callback) callback( bower.cdn.rawgit[ pkgName ] );
+            if (callback) {
+               
+               if (isLatestNeeded) {
+                  /* there are libraries that have included `bower.json` after their latest release.
+                   * this cause the configuration not available when target that version or lower.
+                   * however, it's generally available from master.
+                   * @NOTE hope this hack will not be necessary with the futur online package's loading implementation from v0.5.0 
+                   */
+                  callback( bower.cdn.rawgit[ pkgName ].replace( pkgVersion, 'master') );
+               }
+               else callback( bower.cdn.rawgit[ pkgName ] );
+            }
          });
       }
       
@@ -528,9 +575,9 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
                 * then will not be added to the packages's configuration registry,
                 * associated callback functions are executed with error from bowerder.
                */
-               if ((typeof cbIndex === 'number' || cbIndex instanceof Number) && bower.callbacks[ pkgName ]) {
+               if ((typeof opts.cbi === 'number' || opts.cbi instanceof Number) && bower.callbacks[ pkgName ]) {
 
-                  bower.callbacks[ pkgName ][cbIndex]( {occured: true, from: 'bowerder'} );
+                  bower.callbacks[ pkgName ][opts.cbi]( {occured: true, from: 'bowerder'} );
                } 
 
                bower.browser.error.occured = true;
@@ -603,19 +650,19 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
             pkgConfig.browser.main = (typeof pkgConfig.main === 'string') ? [pkgConfig.main] : pkgConfig.main;
          }
 
-         /* if `pkgCaller` is set, then current loading package adress by `pkgName` is a dependency.
-          * therefore, it have to be added before the `pkgCaller` in the packages's configuration registry.
+         /* if `opts.caller` is set, then current loading package adress by `pkgName` is a dependency.
+          * therefore, it have to be added before the `opts.caller` in the packages's configuration registry.
           * else it's just a package to add in the considered registry.
          */
-         if (pkgCaller) {
+         if (opts.caller) {
 
             // mark package to be synchronously loaded and executed
             pkgConfig.browser.async = false;
-            bower.package( pkgCaller ).browser.async = false;
+            bower.package( opts.caller ).browser.async = false;
 
-            if (bower.packageIndex( pkgCaller ) != -1) {
+            if (bower.packageIndex( opts.caller ) != -1) {
 
-               bower.packagesTree.splice( bower.packageIndex( pkgCaller ), 0, pkgConfig);
+               bower.packagesTree.splice( bower.packageIndex( opts.caller ), 0, pkgConfig);
             }
          }
          else {
@@ -628,9 +675,9 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
 
             var pkgDeps = Object.getOwnPropertyNames( pkgConfig['dependencies'] );
 
-            pkgDeps.forEach( function (name) {
+            pkgDeps.forEach( function (depName) {
 
-               bower.addPackage( name, pkgConfig['name']);
+               bower.addPackage( depName, {caller: pkgConfig['name'], version: pkgConfig['dependencies'][depName]});
             });
          }
       }
@@ -839,16 +886,22 @@ bower.addPackage = function (pkgName, pkgCaller, cbIndex) {
 
 /**
  * import packages "in the DOM" with their dependecies 
- * @param   {string}   pkgName  package's name
+ * @param   {string}   pkgQuery  package's name (with a specified version, ex: name#1.0.0)
  * @param   {function} callback function to run after full package's importation
 */
-bower.import = function (pkgName, callback) {
+bower.import = function (pkgQuery, callback) {
 
-   if (typeof pkgName !== 'string' && !(pkgName instanceof String)) {
+   if (typeof pkgQuery !== 'string' && !(pkgQuery instanceof String)) {
 
       console.error('bowerder:import: argument must be a string' );
       return null;
    }
+   
+   // a query can be the package's name with or without a specified version (ex: name#1.0.0) 
+   pkgQuery = pkgQuery.split('#');
+   var pkgq = {name: pkgQuery[0], version: pkgQuery[1]};
+   // given query is normaly a string so re-formatting is welcome after above manipulations
+   pkgQuery = pkgQuery.join('#');
 
    if (callback) {
 
@@ -858,9 +911,9 @@ bower.import = function (pkgName, callback) {
       }
       else {
 
-         if (!bower.callbacks[ pkgName ]) bower.callbacks[ pkgName ] = [];
+         if (!bower.callbacks[ pkgq.name ]) bower.callbacks[ pkgq.name ] = [];
 
-         bower.callbacks[ pkgName ].push( callback );
+         bower.callbacks[ pkgq.name ].push( callback );
 
          /* with current import's process, callback which is added to the callbacks's registry have the last index.
           * that index is keeped and will be use to access to that callback if necessary in certains conditions.
@@ -868,18 +921,18 @@ bower.import = function (pkgName, callback) {
          */
          if (!(bower.components instanceof Object) && bower.components !== null) {
 
-            bower.browser.waitingImport.push( {name: pkgName, cbIndex: (bower.callbacks[ pkgName ].length - 1)} );
+            bower.browser.waitingImport.push( {name: pkgq.name, version: pkgq.version, cbi: (bower.callbacks[ pkgq.name ].length - 1)} );
          }
-         else bower.addPackage( pkgName, null, (bower.callbacks[ pkgName ].length - 1) );
+         else bower.addPackage( pkgq.name, {version: pkgq.version, cbi: (bower.callbacks[ pkgq.name ].length - 1)} );
       }
    }
    else {
 
       if (!(bower.components instanceof Object) && bower.components !== null) {
 
-         bower.browser.waitingImport.push( {name: pkgName, cbIndex: undefined} );
+         bower.browser.waitingImport.push( {name: pkgq.name, version: pkgq.version, cbi: undefined} );
       }
-      else bower.addPackage( pkgName );
+      else bower.addPackage( pkgq.name, {version: pkgq.version} );
    } 
 
 };
@@ -929,7 +982,7 @@ if (bower.components === undefined) {
 
          bower.browser.waitingImport.forEach( function (pkgInfo) {
 
-            bower.addPackage( pkgInfo.name, null, pkgInfo.cbIndex );
+            bower.addPackage( pkgInfo.name, {version:  pkgInfo.version, cbi: pkgInfo.cbi} );
          });
          bower.browser.waitingImport = [];
       };
