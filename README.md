@@ -107,10 +107,12 @@ $ bowerder auto
 It's possible to load your bower packages via **online CDN service**. This is usefull for projects which don't provide local hosted dependencies *(codepen, jsfiddle, online demo, ...)*.
 For that purpose, just enable the `bower.cdn.usage` property. The actual CDN use by the loader is [cdn.rawgit.com](https://rawgit.com). That will cause online package's loading method to have priority to local loading.
 One of advantages of this functionality is the possibility to switch from local hosted dependencies to online hosting and vis versa, without change concerned code in a associated project.
+Bowerder will loaded by default the latest version of a package, but developer can target a version to load (https://semver.org); however it will be only considered by the loader with this online loading mode through CDN.
+Indeed, for local loading, the loader will considered that, dependencies and appropriates versions will be managed by `bower` through command tools (install, update, ...).
 ```js
 bower.cdn.usage = true ;
 
-bower.import("vue") ;
+bower.import("vue#1.0.26") ;
 bower.import("d3") ;
 bower.import("aos") ;
 

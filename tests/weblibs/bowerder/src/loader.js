@@ -60,6 +60,10 @@ if (typeof bower !== 'undefined' && !(bower.components instanceof Object)) {
  * therefore online package's loading method will have priority to local loading.
  * one of advantages of this functionality is the possibility to switch from local hosted dependencies to online hosting via cdn and vis versa,
  * without change concerned code in a associated project.
+ * 
+ * developer can target a package's version to load; however it will be only considered by the loader with online loading mode through CDN.
+ * indeed, for local loading, the loader will considered that, dependencies and appropriates versions will be managed by `bower` through command tools (install, update, ...).
+ * targetting a package's version can be done through this syntax: `pkg-name#version` (ex: vue#1.0.26). [see](https://semver.org) for supported version sementic.
 */
 
 bower.dir = './bower_components';  // bower base directory
