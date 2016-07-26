@@ -27,7 +27,7 @@
     <span>...waiting for duplicate import...</span>
     
     
-    <script src="weblibs/bowerder/src/loader.js" ></script>
+    <script src="weblibs/bowerder/src/loader.js" data-bowerreg></script>
     <!--<script src="weblibs/.bowerreg.js"></script>-->
     <script>
       bower.ready( function (err) {
@@ -37,7 +37,7 @@
       
       //bower.dir = "weblibs"
       bower.devMode = true ;
-      bower.cdn.usage = true ;
+      //bower.cdn.usage = true ;
       
       // bootstrap depend of jquery, so this line isn't needed.
       // this is to show flexibility in case of duplicate component's importation.

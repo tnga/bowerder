@@ -63,7 +63,9 @@ if (typeof bower !== 'undefined' && !(bower.components instanceof Object)) {
  * 
  * developer can target a package's version to load; however it will be only considered by the loader with online loading mode through CDN.
  * indeed, for local loading, the loader will considered that, dependencies and appropriates versions will be managed by `bower` through command tools (install, update, ...).
- * targetting a package's version can be done through this syntax: `pkg-name#version` (ex: vue#1.0.26). [see](https://semver.org) for supported version sementic.
+ * targeting a package's version can be done through this syntax: `pkg-name#version` (ex: vue#1.0.26). [see](https://semver.org) for supported version sementic.
+ * 
+ * @TODO (v0.4.0) thing about manage appropriate package's version to load (online loading mode) when have duplicate importation (seems that load the highest of two can be a good idea. ex: vue#1.0.25 < vue#1.0.26 then load vue#1.0.26)
 */
 
 bower.dir = './bower_components';  // bower base directory
