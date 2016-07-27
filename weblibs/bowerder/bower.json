@@ -1,0 +1,37 @@
+{
+  "name": "bowerder",
+  "description": "the bower components loader for browsers",
+  "main": "src/loader.js",
+  "browser": {
+    "main": ["dist/loader.min.js"]
+  },
+  "authors": [
+    "Tindo N. Arsel <devtnga@gmail.com>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "bower",
+    "bowerder",
+    "browser",
+    "loader",
+    "import",
+    "component",
+    "package",
+    "module",
+    "registry"
+  ],
+  "moduleType": [
+    "globals"
+  ],
+  "homepage": "http://github.com/tnga/bowerder",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "src/manager.js",
+    "gulpfile.js",
+    "bin",
+    "test",
+    "tests"
+  ]
+}
