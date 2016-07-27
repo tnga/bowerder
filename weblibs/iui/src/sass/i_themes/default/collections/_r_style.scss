@@ -1,0 +1,11 @@
+/*
+* For default theme. Here is the style definition of `r-style` for `i-block` collections, ...
+_____________________________________________________________________________________________*/
+
+
+.i-block.r-style { // full border-radius with box's style
+    
+    border-radius: $block-r-radius ;
+    padding-left: $block-rlr-padding ;
+    padding-right: $block-rlr-padding ;
+}

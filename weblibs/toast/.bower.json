@@ -1,0 +1,18 @@
+{
+  "name": "toast",
+  "version": "1.0.0",
+  "main": [
+    "scss/_grid.scss"
+  ],
+  "license": "MIT",
+  "homepage": "http://daneden.github.io/Toast",
+  "_release": "1.0.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.0.0",
+    "commit": "b6243904bed302c77e013ac862acccc54133f9b4"
+  },
+  "_source": "https://github.com/daneden/Toast.git",
+  "_target": "~1.0.0",
+  "_originalSource": "toast-grid"
+}

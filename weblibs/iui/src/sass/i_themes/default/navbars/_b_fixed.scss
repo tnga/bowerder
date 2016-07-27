@@ -1,0 +1,28 @@
+/*
+* For default theme. Here is the style definition of top-fixed aspect for navbar.
+________________________________________________________________________________*/
+
+
+.i-nav.b-fixed { //fixed on bottom
+
+    @extend .fixed ;
+    bottom: 0px ;
+    left: 0px ;
+    width: 100% ;
+    border: none ;
+    border-top: 1px solid $border-color ;
+    z-index: $global-z-index ;
+
+    >ul li >ul {
+
+        top: auto ;
+        bottom: $navbar-dsm-position ;
+        box-shadow: 0px -3px 3px $shadow-color ;
+
+        li ul {
+
+            top: auto ;
+            bottom: 0em ;
+        }
+    }
+}

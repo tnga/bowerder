@@ -1,0 +1,58 @@
+/*
+* For default theme. Here is the style definition of "mi" design aspect for submenu in navbar.
+_____________________________________________________________________________________________*/
+
+
+.i-nav.mi-style { //Wink: from a homework website menubar style for tutorial (maths and computer science)
+
+    >ul >li {
+
+        position: inherit ; 
+
+        ul {
+
+            left: 0px ;
+            top: $navbar-dsm-position + 0.3 ;
+            width: 100% ;
+            border-top: 1px solid darken( $light-color, 20%) ;
+            text-align: center ;
+
+            &:hover {
+
+                border-top: 1px solid $hover-color ;
+            }
+
+            li {
+
+                display: inline-block ;
+                position: static ;
+                padding: $navbar-padding 0em ;
+                margin-right: $navbar-margin + 0.3 ;
+
+                a {
+
+                    display: inline ;
+                    padding: $navbar-padding 0.2em ;
+                }
+
+                ul {
+
+                    top: $navbar-dsm-position + 0.5 ;
+                }
+            }
+        }
+    }
+
+    /*&.bb-style {
+
+        >ul >li ul {
+
+            top: $navbar-dsm-position + 0.45 ;
+
+            li ul {
+
+                top: $navbar-dsm-position + 0.6 ;
+            }
+        }
+    }*/
+}

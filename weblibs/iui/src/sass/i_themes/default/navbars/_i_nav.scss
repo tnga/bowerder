@@ -1,0 +1,130 @@
+/*
+* For default theme. Here is the style definition of navbar design.
+__________________________________________________________________*/
+
+
+.i-nav { //use for navbar declaration.
+
+    @include global-bg-look() ;
+
+    padding: 0em 0.1em ;
+    border-bottom: 1px solid $border-color ;
+    margin-top: 0px ;
+    position: relative ;
+    font-size: $menu-font-size ;
+
+    >ul { //main item's menu container
+
+        margin: 0px ;
+
+        li { // for item's menu
+
+            display: inline-block ;
+            margin-right: $navbar-margin + 0.3 ;
+            font-family: $item-font-family ;
+            position: relative ;
+            padding: 0em ;
+            box-sizing: border-box ;
+            vertical-align: top ;
+
+            &, a {
+
+                @include global-bg-look("transparent") ;
+            }
+
+            a {
+
+                text-decoration: none ;
+                padding: $navbar-padding 0.2em ;
+                display:inline-block ;
+                max-width: $menu-max-width ;
+
+                @include style-overflow-of("line") ;
+
+                &:hover {
+
+                    color: $hover-color ;
+                }
+                &:focus {
+
+                    @include style-focus-of("none") ;
+
+                    color: $hover-color ;
+                }
+            }
+
+            ul { //sub-item's menu container
+
+                @include global-bg-look() ;
+
+                position: absolute ;
+                top: $navbar-dsm-position ;
+                padding: 0em ;
+                width: $navbar-dsm-width ;
+                box-shadow: 0px 3px 3px $shadow-color ;
+                font-size: $menu-sub-font-size ;
+                z-index: 10 ;
+
+                li { //sub-item's menu
+
+                    display: block ;
+                    padding: 0.1em ;
+                    margin: $navbar-dsm-margin 0em ;
+
+                    a {
+
+                        padding: $navbar-padding ;
+                        display: block ;
+                        margin: 0px ;
+                    }
+
+                    ul {
+
+                        top: 0em ;
+                        right: -($navbar-dsm-width) ;
+                    }
+
+                    &:first-of-type {
+
+                        margin-top: 0.7em ;
+                    }
+                }
+            }
+
+            >ul {
+
+                display: none ;
+            }
+
+            &:hover {
+
+                color: $hover-color ;
+                cursor: pointer ;
+
+                >ul {
+
+                    display: block ;
+                }
+
+                >a:not([href]) {
+
+                    color: $hover-color ;
+                }
+            }
+
+            &#current-page, &#current-item, &.active-item {
+
+                a {
+
+                    color:$select-color ;
+                    font-weight: bold ;
+                }
+            }
+
+            &.unfocusable, &:hover.unfocusable, &:focus.unfocusable {
+
+                @include global-bg-look("transparent", darken( $light-color, 45%) ) ;
+            }
+        }
+    }  
+}

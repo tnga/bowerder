@@ -1,0 +1,19 @@
+/*
+* For default theme. Here is the style definition of border design for selection in navbar.
+__________________________________________________________________________________________*/
+
+.i-nav.b-style { //border style for selection
+
+    >ul li {
+
+        &#current-page, &.active-item {
+
+            border: $navbar-active-border ;
+        }
+
+        &:hover {
+
+            border: $navbar-border ;
+        }
+    }
+}  

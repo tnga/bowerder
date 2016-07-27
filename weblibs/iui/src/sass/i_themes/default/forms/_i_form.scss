@@ -1,0 +1,45 @@
+/*
+* For default theme. Here is the style definition of "i-form" for forms.
+_______________________________________________________________________*/
+
+
+.i-form {
+
+    label {
+
+        margin: 0.3em ;
+
+        span:first-of-type {
+
+            border: 1px solid $border-color ;
+            padding: 0.3em ;
+            margin-left: 0.1em ;
+        }
+
+        input {
+
+            margin-bottom: 0.5em ;
+
+            &[type="radio"]+span:first-of-type, 
+            &[type="checkbox"]+span:first-of-type {
+
+                border: none ;
+                padding: initial ;
+            }
+        }
+
+        &:hover {
+
+            span:first-of-type {
+
+                border: 1px solid $hover-color ;
+            }
+
+            input[type="radio"]+span:first-of-type, 
+            input[type="checkbox"]+span:first-of-type {
+
+                border: none ;
+            }
+        }
+    }
+}

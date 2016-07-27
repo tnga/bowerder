@@ -1,0 +1,15 @@
+/*
+* For default theme. Here is the style definition of some extras features.
+__________________________________________________________________________
+
+* @NOTE definitions here are for global purpose; however there can be a paticular style's definitions associated to other feature.
+* For an example with `.unfocusable` option, here is the global style, but for navbar items, 
+*there is additionnal's defintion set by `.i-nav >ul li.unfocusable` on the considered source file.
+*/
+
+
+.fixed {
+
+    position: fixed ;
+    z-index: $global-z-index / 100 ;
+}

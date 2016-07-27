@@ -1,0 +1,20 @@
+/*
+* For default theme. Here is the style definition of border-top design for selection in navbar.
+_________________________________________________________________________________________________*/
+
+
+.i-nav.bt-style { //border-top style for selection
+
+    >ul li {
+
+        &#current-page, &.active-item {
+
+            border-top: $navbar-active-border ;  
+        }
+
+        &:hover {
+
+            border-top: $navbar-border ;  
+        }
+    }
+} 

@@ -1,0 +1,20 @@
+/*
+* For default theme. Here is the style definition of `cellule-style` design for table.
+_____________________________________________________________________________________*/
+
+
+table.cel-style { //cellule-style for cellule selection
+
+    tr:not( .unfocusable) td {
+
+        //@TODO verify `.unfocusable` implementation on extras features since this (:not) will not work on old browser.
+        &:hover:not( .unfocusable), &:not( .unfocusable).hover {
+
+            @include global-bg-look( lighten( $dark-color, 75%)) ;
+        }
+        &.active-item, &#current-item { //@TODO maybe setting `active-item` when `<tr> is unfocusable` ?
+
+            @include global-bg-look( lighten( $dark-color, 35%), $select-txt-color) ;
+        }
+    }
+}

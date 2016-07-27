@@ -1,0 +1,383 @@
+/*
+ * Base stylesheet's. It's also the basic theme.
+_____________________________________________________*/
+
+
+/* Style on "containers" elements like sections, articles, ...
+--------------------------------------------------------------*/
+
+#i-main-block {
+
+    min-width: $global-min-width;
+    max-width: $global-max-width;
+    width: 100%;
+    margin: -5px auto 0px auto ;
+    position: relative;
+}
+
+body {
+
+    font-family: $default-font-family ;
+    
+    @include global-bg-look() ;
+}
+
+* {
+    &:hover, &:focus {
+     
+        transition: all 0.35s linear ;
+    }
+    &:focus {
+     
+        @include style-focus-of("default") ;
+    }
+    &.hidden {
+        
+        visibility: hidden ;
+    }
+}
+
+
+table {
+
+    border-collapse: collapse ;
+    border-spacing: 0 ;
+    empty-cells: show ;
+    text-align: center ;
+    background: $default-bg-color ;
+
+    td, th {
+
+        padding: 0.5em ;
+        border: 1px solid lighten( $border-color, 50%) ;
+    }
+    
+    tr {
+        
+        border: none ;
+    }
+
+    th {
+
+        background-color: $dark-color ;
+        color: $white-color ;
+        font-family: $item-font-family ;
+        font-size: 0.95em ;
+    }
+}
+
+
+/* Style on "specials and operatings" elements like buttons, textfields, ... 
+----------------------------------------------------------------------------*/
+
+q, blockquote {
+    
+    font-family: $quote-font-family ;
+}
+
+a {
+    
+    text-decoration: none ;
+    color: lighten( $default-txt-color, 30%) ;
+    font-family: $item-font-family ;
+    padding: 1px 2px ;
+    
+    &:hover, &:visited {
+        
+        color: $hover-color ;
+    }
+    &:hover {
+        
+        text-decoration: underline ;
+    }
+    
+    @at-root {
+        
+        a.i-btn, a i-btn, a button {
+            
+            &:hover {
+                
+                text-decoration: none ;
+            }
+            &:visited {
+
+                color: $white-color ;
+            }
+        }
+    }
+}
+
+.i-btn{
+
+    @include button-bg-look($dark-color, $white-color) ;
+    
+           display: inline-block ;
+       line-height: normal ;
+       white-space: nowrap ;    
+          position: relative ;
+
+    vertical-align: middle ;
+           padding: 5px 10px ;
+            margin: 3px ;
+            border: 2px solid $white-color ;
+     border-radius: 10px ;
+        box-shadow: 0px 1px 2px $shadow-color ;
+       font-family: $item-font-family ;
+         font-size: 0.90em;
+        text-align: center ;
+    text-decoration: none ;
+
+    &:hover, &.hovered {
+
+        @include button-bg-look($hover-color, $select-txt-color) ;
+        
+        box-shadow: 0px 1px 2px $hover-color ;
+    }
+    &:active, &.actived {
+
+        box-shadow: 0px 1px 5px $active-color ;
+    }
+    &:focus, &.focused {
+        
+        @include style-focus-of("box") ;
+    }
+    &[disabled], &.disabled, 
+    &[disabled]:hover, &.disabled:hover {
+        
+        @include button-bg-look($disable-color, $white-color) ;
+        cursor: not-allowed ;
+        box-shadow: 0px 1px 1px $disable-color ;
+    }
+    
+    & a {
+        
+        @extend a.i-btn ;
+    }
+}
+
+button, 
+input[ type="button"], 
+input[ type="submit"], 
+input[ type="reset"],
+input[ type="file"] {
+    
+    @extend .i-btn ;
+    
+    @at-root input[ type="file"] {
+        
+        font-size: 0.8em;
+    }
+}
+
+
+select, 
+textarea,
+input[ type="text"], 
+input[ type="password"], 
+input[ type="email"], 
+input[ type="url"],
+input[ type="number"], 
+input[ type="tel"], 
+input[ type="date"], 
+input[ type="month"], 
+input[ type="time"],
+input[ type="datetime"], 
+input[ type="datetime-local"], 
+input[ type="week"], 
+input[ type="search"],
+input[ type="color"] {
+    
+    //@NOTE Need to define this out cause IE8 won't execute CSS that contains a CSS3 selector (like the :not() selector).  
+    @mixin common-input-style {
+
+           font-family: $default-font-family ;
+                border: 1px solid lighten( $border-color, 50%) ;
+         border-radius: 0 ;
+            box-shadow: 1px 1px 4px $shadow-color inset ;
+               padding: 7px ;
+                margin: 3px ;
+                 color: $dark-color ;
+             font-size: 0.91em ;
+                 width: $global-min-width - 50px ;
+            background: $white-color ;
+            box-sizing: border-box ;
+        vertical-align: middle ;
+        
+        &:hover {
+
+            border: 1px solid $hover-color ;
+        }
+        &:focus {
+
+                border: 1px solid $focus-color ;
+            box-shadow: 1px 1px 5px $focus-color inset ;
+            
+            @include style-focus-of("none") ;
+        }
+        
+        &[disabled], &.disabled, 
+        &[disabled]:hover, &.disabled:hover {
+            
+            background: $light-color ;
+            cursor: auto ;
+            border: 1px solid lighten( $disable-color, 50%) ;
+        }
+    }
+
+    @include common-input-style ;
+    
+    @at-root {
+        
+        input[type="color"] {
+        
+            padding: 2px ;
+        }
+        
+        select {
+
+            box-shadow: 1px 1px 3px $shadow-color ;
+
+            &:focus {
+
+                @include style-focus-of("box") ;
+            }
+        }
+        
+        textarea {
+            
+            box-shadow: 1px 1px 5px $shadow-color inset ;
+            
+            &:focus {
+
+                box-shadow: 1px 1px 7px $focus-color inset ;
+            }
+        }
+        
+        /*Need to separate out the :not() selector from the rest of the CSS 2.1 selectors
+         *since IE8 won't execute CSS that contains a CSS3 selector.
+        */
+        input:not([type]) {
+            
+            @include common-input-style ;
+        }
+    }
+}
+
+//@TODO resolve the issue of "no custom checkbox is perform" on firefox, opera, ... 
+
+input[ type="checkbox"],
+input[ type="radio"] {
+    
+    //width: 0px;
+    //height: 0px;
+    margin-left: 0.8em ;
+    margin-right: 0.8em ;
+    cursor: auto ;
+
+    //checkboxes design
+    //:before is use here to create the custom checkbox
+    &:before {
+
+        content: '';
+        position: absolute ;
+        width: 0.90em; 
+        height: 0.90em; 
+        border: 2px solid $white-color ;
+        @include button-bg-look($dark-color, $white-color) ;
+        border-radius: 2px; /* angles arrondis */
+        box-shadow: 0px 0px 2px $shadow-color ;
+    }
+    //general design of the check
+    &:after {
+
+        content: '✔';
+        position: relative;
+        top: 0; 
+        left: 0.25em;
+        font-size: 0.85em ;
+        color: $white-color ;
+        visibility: hidden ;
+    }
+
+    &:focus {
+
+        @include style-focus-of("none") ;
+        
+        &:before {
+            
+            box-shadow: 0px 0px 3px $focus-color ;
+            border: 1px solid $focus-color ;   
+        }
+    }
+    
+    &[disabled] + label, &.disabled + label, 
+    &[disabled]:hover + label, &.disabled:hover + label,
+    &[disabled] + span, &.disabled + span, 
+    &[disabled]:hover + span, &.disabled:hover + span{
+
+        color: darken( $disable-color, 25%) ;
+    }
+    &[disabled]:before, &.disabled:before, 
+    &[disabled]:hover:before, &.disabled:hover:before {
+
+        @include button-bg-look($disable-color, $white-color) ;
+        cursor: not-allowed ;
+        box-shadow: 0px 0px 2px $disable-color ;
+    }
+
+    @at-root {
+
+        input[ type="radio"]:before,
+        label input[ type="radio"]:before, {
+
+            border-radius: 50% ;
+        }
+        
+        &:checked:after {
+
+            visibility: visible ;
+        }
+
+        &:checked:before {
+
+            @include button-bg-look($select-color, $select-txt-color) ;
+        }
+    }
+}
+
+
+label {
+
+    cursor: pointer ;
+    font-family: $item-font-family ;
+    font-size: 0.95em ;
+    display: inline-block ;
+
+    &:hover {
+
+        color: $hover-color ;
+    }
+}
+
+
+fieldset {
+    
+    margin: 1em ;
+    border: 1px solid $border-color ;
+    
+    legend {
+        
+        font-size: 0.85em ;
+        font-family: $item-font-family ;
+    }
+    
+    &:hover {
+        
+        border: 1px solid $hover-color ;
+        
+        legend {
+
+            color: $hover-color ;
+        }
+    }
+}

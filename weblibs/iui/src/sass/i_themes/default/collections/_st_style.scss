@@ -1,0 +1,10 @@
+/*
+* For default theme. Here is the style definition of `st-style` for `i-block` collections, ...
+_____________________________________________________________________________________________*/
+
+
+.i-block.st-style { //more shadow-top with box's style 
+
+    box-shadow: 0px -6px 7px $block-s-shadow-color ;
+    padding: $block-stb-padding $block-slr-padding ;
+}

@@ -1,0 +1,13 @@
+/*
+* For default theme. Here is the style definition of top-fixed aspect for navbar.
+________________________________________________________________________________*/
+
+
+.i-nav.t-fixed { //fixed on top
+
+    @extend .fixed ;
+    top: 0px ;
+    left: 0px ;
+    width: 100% ;
+    z-index: $global-z-index ;
+} 

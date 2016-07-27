@@ -1,0 +1,17 @@
+/*
+* For default theme. Here is the style definition of `h-border` design for table.
+_________________________________________________________________________________*/
+
+
+table.h-border { // horizontal border
+
+    td, th {
+
+        border: none;
+    }
+
+    tr, th {
+
+        border-bottom: 1px solid lighten( $border-color, 50%) ;
+    }
+}

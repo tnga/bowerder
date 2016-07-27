@@ -1,0 +1,90 @@
+/*
+* For default theme. Here is the style definition of `collection` for `i-block` collections, ...
+_____________________________________________________________________________________________*/
+
+
+.i-block.collection { //with few structure tags.
+
+    >h1, >h2, >h3, >h4, >h5, >h6 {
+
+        border-bottom: 1px solid lighten( $border-color, 65%) ;
+        margin-bottom: 0.7em ;
+    }
+    h1, h2, h3, h4, h5, h6 {
+
+        color: lighten( $default-txt-color, 35%) ;
+    }
+
+    >section, >div, >header, >footer {
+
+        margin: 0.5em auto ;
+        padding: 0.5em 0em ;
+    }
+
+    >section, >div {
+
+        border-top: 1px solid lighten( $border-color, 73%) ;
+        border-bottom: 1px solid lighten( $border-color, 73%) ;
+    }
+
+    >header, >footer {
+
+        border-top: 1px dashed lighten( $border-color, 73%) ;
+        border-bottom: 1px dashed lighten( $border-color, 73%) ;
+    }
+
+    >li, >a {
+
+        display: block ;
+        border-top: 1px solid lighten( $border-color, 65%) ;
+        border-bottom: 1px solid lighten( $border-color, 65%) ;
+        margin: 0px ;
+        padding: 0.7em 0.3em ;
+
+        >h1, >h2, >h3, >h4, >h5, >h6 {
+
+            margin: 0.3em 0em ;
+        }
+
+        +li, +a {
+
+            border-top: none ;
+        }
+    }
+
+    >a:hover {
+
+        cursor: pointer ;
+        text-decoration: none ;
+    }
+
+    &:not( .unfocusable) >li, &:not( .unfocusable) >a {
+
+        //@TODO verify `.unfocusable` implementation on extras features since this (:not) will not work on old browser.
+        &:hover:not( .unfocusable), &:not( .unfocusable).hover {
+
+            @include global-bg-look( lighten( $dark-color, 71%)) ;
+        }
+        &:active:not( .unfocusable), &.active-item, &#current-item { //@TODO maybe setting `active-item` when `unfocusable` ?
+
+            transition: none ; //@TODO remove or modify this when will use `hover` library
+
+            @include global-bg-look( $hover-color, $select-txt-color) ;
+        }
+    }
+    &.disable >li, &>li.disable { //@FIXME when will implement `.disable` in extras features. this not have to be affected by `:hover` or `:active` actions.
+
+        &, &:hover, &.hover-item, &:active, &.active-item, &#current-item {
+
+            @include global-bg-look( "transparent", darken( $disable-color, 25%) ) ;
+        }
+    }
+}
+
+ul.i-block.collection {
+
+    >h1, >h2, >h3, >h4, >h5, >h6 {
+
+        border: none ;
+    }
+}

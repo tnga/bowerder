@@ -1,0 +1,12 @@
+/*
+* For default theme. Here is the style definition of all iui custom table features.
+____________________________________________________________________________________*/
+
+
+@import 'tables/no_border.scss' ;
+@import 'tables/h_border.scss' ;
+@import 'tables/v_border.scss' ;
+@import 'tables/line_style.scss' ;
+@import 'tables/cel_style.scss' ;
+
+//@TODO implement `.col-style` for column selection. Javascript can be necessary for that.

@@ -1,0 +1,20 @@
+/*
+* For default theme. Here is the style definition of border-left design for selection in navbar.
+_______________________________________________________________________________________________*/
+
+
+.i-nav.bl-style { //border-left style for selection
+
+    >ul li {
+
+        &#current-page, &.active-item {
+
+            border-left: $navbar-active-border ;
+        }
+
+        &:hover {
+
+            border-left: $navbar-border ;   
+        }
+    }
+}

@@ -1,0 +1,34 @@
+/*
+* For default theme. Here is the style definition of background design for selection in navbar.
+______________________________________________________________________________________________*/
+
+
+
+.i-nav.bg-style { //background style for selection
+
+    >ul li {
+
+        &:hover, &#current-page, &.active-item {
+
+            @include global-bg-look( $select-color, $select-txt-color) ;
+
+            >a:not([href]) {
+
+                color: $white-color ;
+            }
+        }
+
+        &#current-page, &.active-item {
+
+            a {
+
+                color: $white-color ;
+            }
+        }  
+
+        a:hover {
+
+            @include global-bg-look( "transparent", $white-color) ;
+        }
+    }
+}

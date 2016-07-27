@@ -1,0 +1,31 @@
+/*
+* For default theme. Here is the style definition of "mi-style" design for forms.
+________________________________________________________________________________*/
+
+
+.i-form.mi-style { //wink: from "paymo project" form design
+
+    box-shadow: 1px 3px 3px $shadow-color ;
+    padding: 1em ;
+    min-width: $global-min-width ;
+    width: 50% ;
+    margin: auto ;
+    border-radius: 25px ;
+
+    label {
+
+        display: block ;
+        margin: 1.1em auto ;
+        position: relative ;
+        width: $global-min-width - 40px ;
+
+        span:first-child {
+
+            margin-bottom: -0.4em ;
+            display: inline-block ;
+            max-width: $global-min-width - 50px ;
+
+            @include style-overflow-of('line') ;
+        }
+    }
+}

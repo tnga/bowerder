@@ -1,0 +1,84 @@
+/*
+* For default theme. Here is the style definition of all iui custom grid features.
+==================================================================================
+
+* @NOTE grid's styles definitions here are based on [toast-grid]( https://github.com/daneden/Toast).
+* Beside IUI provide it own "grid using syntax", toast syntax is also compatible (just look at associated docs).
+*
+* Here is the style definition of "IUI's grid syntax"
+* @NOTE if iui-toast modifications are not merge to the toast branch; then iui will stop using the library and will implement it own way.
+*/
+
+$toast-grid-namespace: "i-grid" ;
+$toast-grid-column-namespace: "grid" ;
+$toast-gutter-width: 0.3em ;
+
+
+@import '../../../../bower_components/iui_toast/scss/grid.scss' ;
+
+
+// For each of our column groups...
+@each $group in $toast-col-groups {
+    
+    // For each column width from 1 to the column group...
+    @for $i from 1 through $group {
+
+        .col-#{$i}-of-#{$group} {
+
+            @extend .#{$toast-grid-column-namespace}--#{$i}-of-#{$group} ;
+        }
+
+        @if ($toast-pushes) {
+            
+            .#{$toast-grid-column-namespace}.push-#{$i}-of-#{$group} {
+                
+                @extend  .#{$toast-grid-column-namespace}--push-#{$i}-of-#{$group} ;
+            }
+        }
+
+        @if ($toast-pulls) {
+
+            .#{$toast-grid-column-namespace}.pull-#{$i}-of-#{$group} {
+
+                @extend  .#{$toast-grid-column-namespace}--pull-#{$i}-of-#{$group} ;
+            }
+        }
+    }
+}
+
+
+// Centers the column in the grid and clears the row of all other columns
+.#{$toast-grid-column-namespace}.centered {
+    
+    @extend .#{$toast-grid-column-namespace}--centered ;
+}
+// Displays the column as the first in its row
+.#{$toast-grid-column-namespace}.d-first {
+    
+    @extend .#{$toast-grid-column-namespace}--d-first ;
+}
+// Displays the column as the last in its row
+.#{$toast-grid-column-namespace}.d-last {
+    
+    @extend .#{$toast-grid-column-namespace}--d-last ;
+}
+// Removes gutters from the columns
+.#{$toast-grid-namespace}.no-gutter {
+    
+    @extend .#{$toast-grid-namespace}--no-gutter ;
+}
+// Removes gutters from the columns
+.span-all {
+    
+    @extend .#{$toast-grid-column-namespace}--span-all  ;
+}
+// Align column to the bottom.
+.#{$toast-grid-column-namespace}.align-b {
+    
+    @extend .#{$toast-grid-column-namespace}--ab ;
+}
+// Align column to the middle.
+.#{$toast-grid-column-namespace}.align-m {
+    
+    @extend .#{$toast-grid-column-namespace}--am ;
+}

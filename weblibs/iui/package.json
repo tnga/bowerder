@@ -1,0 +1,47 @@
+{
+  "name": "iui",
+  "version": "0.0.0",
+  "description": "Simple mini sass/css library which provide some user's friendly designs for the associated projects.",
+  "main": "gulpfile.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "es6-promise": "^3.0.2",
+    "gulp": "~3.9.0",
+    "gulp-autoprefixer": "~3.1.0",
+    "gulp-cssnano": "~2.1.0",
+    "gulp-ignore": "^2.0.1",
+    "gulp-rename": "~1.2.2",
+    "gulp-ruby-sass": "~2.0.6",
+    "gulp-sourcemaps": "~1.6.0",
+    "node-notifier": "^4.4.0"
+  },
+  "scripts": {
+    "test": "gulp build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tnga/lib.iui"
+  },
+  "keywords": [
+    "sass",
+    "css",
+    "library",
+    "framework",
+    "style",
+    "stylesheet",
+    "js",
+    "javascript",
+    "design",
+    "ui",
+    "web",
+    "html"
+  ],
+  "author": "Tindo Ngoufo Arsel <devtnga@gmail.com>",
+  "license": "LGPL-2.1+",
+  "bugs": {
+    "url": "https://github.com/tnga/lib.iui/issues"
+  }
+}

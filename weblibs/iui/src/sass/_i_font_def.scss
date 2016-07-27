@@ -1,0 +1,81 @@
+/*
+ * Fichier de style où sont définies les fonts à utiliser
+   ______________________________________________________*/
+
+/*pour plus de clarté ce fichier sera inclue dans le fichier css commun ou générale*/
+
+$font-path: "./fonts" ;
+
+
+@mixin default-font-aspect {
+
+	font-weight: normal ;
+	 font-style: normal ;
+}
+
+@font-face
+	{
+		font-family: '_Ubuntu' ;
+		src: url('#{$font-path}/Ubuntu.ttf') ;
+
+		@include default-font-aspect ;
+	}
+@font-face
+	{
+		font-family: '_Raleway' ;
+		src: url('#{$font-path}/Raleway_Regular.ttf') ;
+
+		@include default-font-aspect ;
+	}
+@font-face
+	{
+		font-family: '_Droid_Sans' ;
+		src: url('#{$font-path}/DroidSans.ttf') ;
+
+		@include default-font-aspect ;
+	}
+@font-face
+	{
+		font-family: '_Purisa' ;
+		src: url('#{$font-path}/Purisa.ttf') ;
+
+		@include default-font-aspect ;
+	}
+@font-face
+	{
+		font-family: '_DejaVu_Sans' ;
+		src: url('#{$font-path}/DejaVuSans.ttf') ;
+
+		@include default-font-aspect ;
+	}
+@font-face
+	{
+		font-family: '_Andale_Mono' ;
+		src: url('#{$font-path}/Andale_Mono.ttf') ;
+
+		@include default-font-aspect ;
+
+	}
+@font-face
+	{
+		font-family: '_Candara' ;
+		src: url('#{$font-path}/candara.ttf') ;
+
+		@include default-font-aspect ;
+
+	}
+@font-face
+	{
+		font-family: '_GE_Inspira' ;
+		src: url('#{$font-path}/GE_Inspira.ttf') ;
+
+		@include default-font-aspect ;
+
+	}
+@font-face
+	{
+		font-family: '_FreeSerif' ;
+		src: url('#{$font-path}/FreeSerif.ttf') ;
+
+		@include default-font-aspect ;
+	}

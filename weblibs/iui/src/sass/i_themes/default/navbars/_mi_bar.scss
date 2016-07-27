@@ -1,0 +1,87 @@
+/*
+* For default theme. Here is the style definition of "mi-bar" from umiproject's website navbar.
+______________________________________________________________________________________________*/
+
+
+.i-nav.mi-bar { //From first umiproject's website menubar style
+
+    box-shadow: 0px 4px 5px $shadow-color ;
+    border: none ;
+    padding: $navbar-padding+0.2 $navbar-padding ($navbar-padding - 0.2) $navbar-padding ;
+
+    &.b-fixed {
+
+        box-shadow: 0px -4px 5px $shadow-color ;
+        border: none ;
+        padding: ($navbar-padding - 0.1) $navbar-padding $navbar-padding+0.1 $navbar-padding ;
+
+        >ul {
+
+            li {
+
+                vertical-align: bottom ;
+
+                >ul {
+
+                    top: auto ;
+                    bottom: $navbar-dsm-position + 0.2 ;
+                    box-shadow: 0px -3px 3px $shadow-color ;
+
+                    li ul {
+
+                        top: auto ;
+                        bottom: 0em ;
+                    }
+                }
+            }
+
+        }
+    }
+
+    &.mi-style {
+
+        >ul >li ul {
+
+            top: $navbar-dsm-position + 1.1 ;
+
+            li {
+
+                margin: $navbar-margin ($navbar-margin - 0.1) ;
+
+                ul {
+
+                    top: $navbar-dsm-position + 0.7 ;
+                }
+            }
+        }
+
+        &.b-fixed {
+
+            >ul >li ul {
+
+                top: auto ;
+                bottom: $navbar-dsm-position + 0.9 ;
+                border: none ;
+                border-bottom: 1px solid darken( $light-color, 20%) ;
+
+                li {
+
+                    margin: $navbar-margin ($navbar-margin - 0.1) ;
+
+                    ul {
+
+                        top: auto;
+                        bottom: $navbar-dsm-position + 0.7 ;
+                    }
+                }
+
+                &:hover {
+
+                    border: none ;
+                    border-bottom: 1px solid $hover-color ;
+                }
+            }
+
+        }
+    }
+}

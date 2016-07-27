@@ -1,0 +1,19 @@
+/*
+* For default theme. Here is the style definition of `v-border` design for table.
+_________________________________________________________________________________*/
+
+
+table.v-border { // vertical border
+
+    td, th {
+
+        border: none ;
+        border-left: 1px solid lighten( $border-color, 50%) ;
+        border-right: 1px solid lighten( $border-color, 50%) ;
+    }
+
+    tr:last-of-type {
+
+        border-bottom: 1px solid lighten( $border-color, 50%) ;
+    }
+}

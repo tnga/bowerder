@@ -1,0 +1,123 @@
+/*
+* For default theme. Here is the style definition of all iui custom grid features.
+==================================================================================
+
+* @NOTE grid's styles definitions here are based on [toast-grid]( https://github.com/daneden/Toast).
+* Beside IUI provide it own "grid using syntax", toast syntax is also compatible (just look at associated docs). 
+*/
+
+
+@import '../../../bower_components/toast/scss/grid.scss' ;
+
+/*
+* Here is the style definition of "IUI's grid syntax".
+_____________________________________________________*/
+
+// For each of our column groups...
+@each $group in $toast-col-groups {
+    
+    // For each column width from 1 to the column group...
+    @for $i from 1 through $group {
+
+        .col-#{$i}-of-#{$group} {
+
+            @extend .#{$toast-grid-column-namespace}--#{$i}-of-#{$group} ;
+            @extend .#{$toast-grid-column-namespace} ;
+        }
+    }
+}
+
+/* // For each of our toast breaking point column size groups...
+@each $group in (2, 3, 4) { //@TODO set group up to 12 or higher when toast will support it.
+
+    // For each column width from 1 to the column group...
+    @for $i from 1 through ($group - 1) {
+
+        .col-#{$i}-of-#{$group}.medium {
+
+            @extend .#{$toast-grid-column-namespace}.#{$toast-grid-column-namespace}--m-#{$i}-of-#{$group} ;
+        }
+    }
+}*/
+
+
+/*
+// For each of our toast breaking point column size groups...
+@each $group in (2, 3, 4) { //@TODO set group up to 12 or higher when toast will support it.
+
+// For each column width from 1 to the column group...
+@for $i from 1 through ($group - 1) {
+
+.col-#{$i}-of-#{$group}.medium {
+
+@extend .#{$toast-grid-column-namespace}.#{$toast-grid-column-namespace}--m-#{$i}-of-#{$group} ;
+}
+}
+}
+
+// For each of our toast breaking point column size groups...
+@each $group in (2, 3, 4) { //@TODO set group up to 12 or higher when toast will support it.
+
+// For each column width from 1 to the column group...
+@for $i from 1 through ($group - 1) {
+
+.col-#{$i}-of-#{$group}.small {
+
+@extend .#{$toast-grid-column-namespace}.#{$toast-grid-column-namespace}--s-#{$i}-of-#{$group} ;
+}
+}
+}
+
+@media (max-width: $toast-breakpoint-medium) and (min-width: $toast-breakpoint-small) {
+
+.#{$toast-grid-column-namespace}[class*="medium"] {
+
+display: inline-block;
+margin-right: -.24em;
+}
+}
+@media (max-width: $toast-breakpoint-small) {
+
+.#{$toast-grid-column-namespace}[class*="small"] {
+
+display: inline-block;
+margin-right: -.24em;
+}
+}
+
+// Centers the column in the grid and clears the row of all other columns
+.#{$toast-grid-column-namespace}.centered {
+
+@extend .#{$toast-grid-column-namespace}--centered ;
+}
+// Displays the column as the first in its row
+.#{$toast-grid-column-namespace}.d-first {
+
+@extend .#{$toast-grid-column-namespace}--d-first ;
+}
+// Displays the column as the last in its row
+.#{$toast-grid-column-namespace}.d-last {
+
+@extend .#{$toast-grid-column-namespace}--d-last ;
+}
+// Removes gutters from the columns
+.#{$toast-grid-namespace}.no-gutter {
+
+@extend .#{$toast-grid-namespace}--no-gutter ;
+}
+// Removes gutters from the columns
+.span-all {
+
+@extend .#{$toast-grid-column-namespace}--span-all  ;
+}
+// Align column to the bottom.
+.#{$toast-grid-column-namespace}.align-b {
+
+@extend .#{$toast-grid-column-namespace}--ab ;
+}
+// Align column to the middle.
+.#{$toast-grid-column-namespace}.align-m {
+
+@extend .#{$toast-grid-column-namespace}--am ;
+}
+*/

@@ -1,0 +1,26 @@
+/*
+* For default theme. Here is the style definition of border-bottom design for selection in navbar.
+_________________________________________________________________________________________________*/
+
+
+.i-nav.bb-style { //border-bottom style for selection
+
+    &>ul>li>a {
+
+        padding-left: 0.1em ;
+        padding-right: 0.1em ;
+    }
+
+    >ul li {
+
+        &#current-page, &.active-item {
+
+            border-bottom: $navbar-active-border ; 
+        }
+
+        &:hover {
+
+            border-bottom: $navbar-border ; 
+        }
+    }
+} 

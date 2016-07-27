@@ -1,0 +1,19 @@
+/*
+* For default theme. Here is the style definition of `no-border` design for table.
+_________________________________________________________________________________*/
+
+
+table.no-border {
+
+    th {
+
+        border-left: none ;
+        border-right: none ;
+        border-top: none ;
+    }
+
+    tr, td {
+
+        border: none ; 
+    }
+}

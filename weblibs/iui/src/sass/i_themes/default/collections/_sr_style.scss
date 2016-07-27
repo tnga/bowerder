@@ -1,0 +1,10 @@
+/*
+* For default theme. Here is the style definition of `sr-style` for `i-block` collections, ...
+_____________________________________________________________________________________________*/
+
+
+.i-block.sr-style { //more shadow-right with box's style 
+
+    box-shadow: 6px 0px 7px $block-s-shadow-color ;
+    padding: $block-stb-padding $block-slr-padding ;
+}

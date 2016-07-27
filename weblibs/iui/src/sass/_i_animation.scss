@@ -1,0 +1,55 @@
+//*
+//* Fichier pour la déclaration des propriétées d’animation.
+//_____________________________________________________________*/
+
+@mixin animated {
+
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+
+@mixin animated-bounce {
+
+  animation-name: bounce;
+  transform-origin: center bottom;
+}
+
+
+@mixin animated-bounceIn {
+
+  animation-name: bounceIn;
+}
+
+
+@mixin animated-bounceInUp {
+
+  animation-name: bounceInUp;
+}
+
+
+@mixin animated-bounceInDown {
+
+  animation-name: bounceInDown;
+}
+
+
+@mixin animated-flash {
+
+  animation-name: flash;
+}
+
+@mixin animated-fadeIn {
+
+  animation-name: fadeIn;
+}
+
+
+@mixin animated-pulse {
+
+  animation-name: pulse;
+}
+
+@mixin animated-rubberBand {
+  animation-name: rubberBand;
+}

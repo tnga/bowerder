@@ -1,0 +1,26 @@
+/*
+* For default theme. Here is the style definition of `line-style` design for table.
+__________________________________________________________________________________*/
+
+
+table.line-style { //line-style for line selection
+
+    //@TODO verify `.unfocusable` implementation on extras features since this (:not) will not work on old browser.
+    tr:hover:not( .unfocusable), tr:not( .unfocusable).hover {
+
+        @include global-bg-look( lighten( $dark-color, 60%)) ;
+    }
+
+    th, tr {
+
+        &.active-item, &#current-item {
+
+            @include global-bg-look( $hover-color, $select-txt-color) ;
+        }
+    } 
+
+    td.active-item, td#current-item {
+
+        @include global-bg-look( lighten( $dark-color, 35%), $select-txt-color) ;
+    }
+}

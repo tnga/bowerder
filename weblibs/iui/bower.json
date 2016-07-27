@@ -1,0 +1,35 @@
+{
+  "name": "iui",
+  "description": "Simple mini sass/css library which provide some user's friendly designs for the associated projects.",
+  "main": "iui.css",
+  "authors": [
+    "Tindo Ngoufo Arsel <devtnga@gmail.com>"
+  ],
+  "license": "LGPL-2.1+",
+  "keywords": [
+    "sass",
+    "css",
+    "library",
+    "framework",
+    "style",
+    "stylesheet",
+    "js",
+    "javascript",
+    "design",
+    "ui",
+    "web",
+    "html"
+  ],
+  "moduleType": [],
+  "homepage": "https://github.com/tnga/lib.iui",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "toast": "toast-grid#~1.0.0"
+  }
+}

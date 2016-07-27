@@ -1,0 +1,129 @@
+// /* Global's variables déclarations
+// ----------------------------------*/
+
+$global-min-width: 280px ;
+$global-max-width: 1400px ;
+$global-small-width: 800px ;
+$global-smaller-width: 640px ;
+$global-normal-width: 1024px ;
+$global-big-width: 1280px ;
+
+$global-z-index: 1000 ;
+
+$white-color: #fff ;
+$red-color: #f00 ;
+$yellow-color: yellow ;
+$light-color: #f2f2f2 ;
+$black-color: #1a1a1a ;
+$dark-color: #2d2d2d ;
+
+$focus-color: #ff6600 ;
+$hover-color: $focus-color ;
+$active-color: $focus-color ;
+$select-color: $focus-color ;
+$disable-color: #d0d0d0 ;
+$warring-color: $yellow-color ;
+$success-color: $focus-color ;
+$error-color: $red-color ;
+
+$border-color: $dark-color ;
+$default-bg-color: $white-color ;
+$default-txt-color: $black-color ;
+$select-txt-color: $white-color ;
+
+$shadow-color: rgba(103, 103, 103, 0.7) ;
+
+$default-font-family: "DejaVu Sans", _DejaVu_Sans, verdana, OpenSans, sans-serif ;
+$item-font-family: Ubuntu, _Ubuntu, $default-font-family ;
+$quote-font-family: Purisa, i_Purisa, "Lucida Handwriting", "Comic Sans Ms" ;
+
+
+// /* Global's mixins declarations
+// --------------------------------*/
+
+@mixin button-bg-look ($btn-color, $txt-color) {
+
+    color: $txt-color ;
+    background-color: $btn-color ;
+    background-image: linear-gradient(to top, $btn-color, lighten($btn-color,10%), lighten($btn-color,15%)) ;
+}
+
+@mixin global-bg-look ($bg-color:$default-bg-color, $txt-color:$default-txt-color) {
+
+    color: #{$txt-color} ;
+    background-color: #{$bg-color} ; 
+    //background-image: linear-gradient(to top, $bg-color, lighten($bg-color,5%), lighten($bg-color,10%)) ;
+}
+
+@mixin style-focus-of ($elt-type:default) {
+    
+    @if $elt-type == "box" {
+        outline: 0 ;
+        box-shadow: 0px 1px 5px $focus-color ; 
+        
+    }@else if $elt-type == "text" {
+        outline: 0 ;
+        text-shadow: 0px 0px 3px $focus-color ;   
+        
+    }@else if $elt-type == "none" {
+        outline: 0 ;
+        
+    }@else {
+        outline: thin solid $focus-color ;
+    }
+}
+
+//this can only be use if the associated element to apply with is resizable ( type: `block`, `inline-block`, ...)
+@mixin style-overflow-of ($elt-mode:default) {
+    
+    @if ($elt-mode == "line") {
+        white-space: nowrap ;
+        overflow: hidden ;
+        text-overflow: ellipsis ;
+        
+    }@else if ($elt-mode == "none") {
+        white-space: normal ;
+        overflow: visible ;
+        text-overflow: clip;
+        
+    }@else { //for default or box mode
+        //@TODO have to test if the ellipsis are showing with this case of text-overflow.
+        white-space: normal ;
+        overflow: hidden ;
+        text-overflow: ellipsis ;
+    }
+}
+
+
+// /* Particular's variables déclarations
+// --------------------------------------*/
+
+//----------------------------
+//For some navbar's properties
+
+$navbar-border: 0.15em solid $hover-color ;
+$navbar-active-border: 0.25em solid $select-color ;
+$navbar-padding: 0.5em ;
+$navbar-margin: 0.5em ;
+$navbar-dsm-margin: 0.3em ; //navbar default submenu margin
+
+$navbar-dsm-width: 10em ; //navbar default submenu width
+$navbar-dsm-position: 1.9em ; //navbar default submenu position
+
+$menu-font-size: 1.05em ;
+$menu-sub-font-size: 1.0em ; //default submenu font size
+$menu-max-width: 200px ;
+
+
+//----------------------------
+//For some collections's properties
+
+$block-tb-padding: 1.3em ; //top-bottom padding size
+$block-lr-padding: 0.9em ; //left-right padding size
+$block-stb-padding: $block-tb-padding + 0.2 ; //shadow-style's top-bottom padding size
+$block-slr-padding: $block-lr-padding ; //shadow-style's left-right padding size
+$block-rlr-padding: $block-lr-padding + 0.4 ; //radius-style's left-right padding size
+
+$block-s-shadow-color: lighten( $shadow-color, 15%) ; //shadow-style's shadow color ;
+
+$block-r-radius: 3em ; //radius-style's border radius ;
