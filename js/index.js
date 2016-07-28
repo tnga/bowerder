@@ -20,3 +20,10 @@ bower.import('reveal.js', function (err) {
 		]
 	});
 });
+
+
+function setSideBarDisplay() {
+	
+	var sidebar = document.getElementById('sidebar');
+	if (sidebar.hasAttribute('data-hidden')) sidebar.removeAttribute('data-hidden'); else sidebar.setAttribute('data-hidden', true);
+}

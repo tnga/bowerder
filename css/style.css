@@ -1,3 +1,46 @@
+#fixed-icon {
+	
+	position: fixed ;
+	top: 5px ;
+	left: -15px ;
+	z-index: 100 ;
+	border-radius: 50% ;
+	box-shadow: 0px 0px 10px #bcbcbc;
+	overflow: hidden ;
+	padding: 3px ;
+	opacity: 0.9 ;
+}
+#fixed-icon:hover {
+	
+	opacity: 1 ;
+	border: 3px solid #f60 ;
+} 
+#fixed-icon >img {
+	
+	width: 64px;
+}
+
+#sidebar {
+	
+	width: 30% ;
+	max-width: 300px ;
+	min-width: 180px ;
+	height: 100% ;
+	padding: 95px 10px 10px 10px ;
+	overflow: auto ;
+}
+#sidebar >ul >li, #sidebar >ul >li >a {
+	
+	display: block ;
+	text-align: center ;
+	max-width: 100%;
+}
+
+*[data-hidden] {
+	
+	display: none ;
+}
+
 img[alt="bowerder-logo"] {
 	
 	border: none !important ;
