@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>bowerder - the bower components loader for browsers</title>
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="weblibs/reveal.js/lib/css/zenburn.css">
+
+		<link rel="stylesheet" href="weblibs/iui/dist/iui.min.css">
+		<link rel="stylesheet" href="weblibs/octicons/build/octicons.min.css">
+		<link rel="stylesheet" href="weblibs/octicons/build/font/octicons.min.css">
+		<link rel="stylesheet" href="weblibs/reveal.js/css/theme/white.css">
+		<link rel="stylesheet" href="css/style.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<script src="weblibs/bowerder/dist/loader.min.js" data-bowerreg></script>
+	</head>
+
+	<body>
+
+		<div class="reveal">
+			<div class="slides">
+				<!-- Use external markdown resource, separate slides by three newlines; vertical slides by two newlines -->
+				<section data-markdown="README.md" data-separator="^\n\n\n" data-separator-vertical="^\n\n"></section>
+			</div>
+		</div>
+
+		<script src="js/index.js"></script>
+
+	</body>
+
+</html>
