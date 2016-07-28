@@ -196,7 +196,7 @@ function openMIDialog(content, dWidth, dHeight) {
 		if ( dialogSection.offsetHeight > maxDSHeight) {
 
 			dialogSection.offsetHeight = (maxDSHeight >= 100) ? maxDSHeight + "px" : "100px" ;
-			dialogSection.style.margin = "15% auto" ;
+			dialogSection.style.margin = "10% auto" ;
 
 		} else {
 
