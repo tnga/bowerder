@@ -1,10 +1,10 @@
+//bower.cdn.usage = true;
+
 //bower.import('octicons');
 bower.import('iui');
 bower.import('reveal.js', function (err) {
 	
-	if (err.occured) {
-		throw new Error('Oops it seems like `reveal.js` wasn\'t fully loaded by:'+ err.from) ;
-	}
+	if (err.occured) throw new Error('Oops it seems like `reveal.js` wasn\'t fully loaded by:'+ err.from) ;
 	
 	// More info https://github.com/hakimel/reveal.js#configuration
 	Reveal.initialize({
@@ -12,11 +12,23 @@ bower.import('reveal.js', function (err) {
 
 		// More info https://github.com/hakimel/reveal.js#dependencies
 		dependencies: [
-			{ src: 'weblibs/reveal.js/plugin/markdown/marked.js' },
-			{ src: 'weblibs/reveal.js/plugin/markdown/markdown.js' },
-			//{ src: 'plugin/notes/notes.js', async: true },
-			{ src: 'weblibs/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlighting(); } }
+			{ src: basePath +'/weblibs/reveal.js/plugin/markdown/marked.js' },
+			{ src: basePath +'/weblibs/reveal.js/plugin/markdown/markdown.js', callback: function() { document.getElementById('bowerder-logo').src = basePath +'/bowerder.png' } },
+			//{ src: basePath +'/plugin/notes/notes.js', async: true },
+			{ src: basePath+ '/weblibs/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlighting(); } }
 		]
+	});
+});
+bower.import('vue', function (err) {
+	
+	if (err.occured) throw new Error('Oops it seems like `vue` wasn\'t fully loaded by:'+ err.from) ;
+	
+	var iconView = new Vue({
+		el: '#fixed-icon',
+		data: {
+			basePath: basePath,
+			fixedIconPath: this.basePath +'/icon.png'
+		}
 	});
 });
 
@@ -43,8 +55,8 @@ bower.ready( function (err) {
 
 // first execution
 //----------------
-
-var dialogSectionContent = openMIDialog("<center>waiting for modules loading ...</center>") ;
+var basePath = !bower.cdn.usage ? '.' : 'cdn.rawgit.com/tnga/bowerder/gh-pages' ;
+var dialogSectionContent = openMIDialog('<center><i class="loading"></i><br/> waiting for modules loading ...</center>') ;
  
 //--------------------
 // end first execution

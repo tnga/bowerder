@@ -47,6 +47,26 @@ img[alt="bowerder-logo"] {
 	box-shadow: none !important ;
 }
 
+
+@keyframes spin {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+.loading {
+	display: inline-block;
+	border-radius: 50%;
+	width: 64px;
+	height: 64px;
+	border: .25rem solid rgba(0,0,0,0.2);
+	border-top-color: black;
+	animation: spin 1s infinite linear;
+}
+
 /* @TODO remove this below hack when will upgrade to a next stable IUI production, considering that it will be a part functionnality
 
 /* Certains scripts sont utiliser pour générer du code HTML nécessaire pour gérer

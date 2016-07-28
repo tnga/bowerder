@@ -1,7 +1,7 @@
 ## bowerder
 > the bower components loader for browsers
 
-<center> ![bowerder-logo](bowerder.png) </center>
+<center> <img alt="bowerder-logo" src="bowerder.png" id="bowerder-logo" /> </center>
 Easly Import your components or libraries installed via bower to your project.
 
 
