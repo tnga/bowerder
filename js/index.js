@@ -1,6 +1,6 @@
 //bower.cdn.usage = true;
 
-//bower.import('octicons');
+bower.import('ijs');
 bower.import('iui');
 bower.import('reveal.js', function (err) {
 	
@@ -63,6 +63,13 @@ bower.ready( function (err) {
 	// hide sidebar after 10s
 	setTimeout( setSideBarDisplay, 10000);
 	
+	if (typeof iJS !== "undefined") {
+		
+		iJS.animate( dialogSectionContent, 'shake');
+		iJS.animate('fixed-icon', 'pulse', -1);
+		iJS.animate('with-heart', 'pulse', -1);
+	}
+	
 	if (err.occured) {
 		var errMsg = '' ;
 		if (err.fromBrowser.length !== 0) errMsg += 'Oops it seems like: '+ err.fromBrowser.join(', ') +' occured a loading error from: browser \n';
@@ -89,7 +96,19 @@ var dialogSectionContent = openMIDialog('<center><i class="loading"></i><br/> wa
 function setSideBarDisplay() {
 	
 	var sidebar = document.getElementById('sidebar');
-	if (sidebar.hasAttribute('data-hidden')) sidebar.removeAttribute('data-hidden'); else sidebar.setAttribute('data-hidden', true);
+	if (sidebar.hasAttribute('data-hidden')) {
+		
+		if (typeof iJS !== "undefined") iJS.animate( sidebar, 'slide-in-left');
+		sidebar.removeAttribute('data-hidden');
+	} 
+	else {
+	
+		if (typeof iJS !== "undefined") {
+			var outAnime = iJS.animate( sidebar, 'slide-out-left');
+			outAnime.onfinish = function () {sidebar.setAttribute('data-hidden', true);}
+		}
+		else sidebar.setAttribute('data-hidden', true);
+	}
 }
 
 // @TODO remove this below hack when will upgrade to a next stable IUI production, considering that it will be a part functionnality
@@ -146,6 +165,12 @@ function openMIDialog(content, dWidth, dHeight) {
 
 	document.body.style.overflow = "hidden";
 	document.body.appendChild(mainFixedBlock);
+	
+	if (typeof iJS !== "undefined") {
+		
+		iJS.animate( mainFixedBlock, 'fade-in');
+		iJS.animate( dialogSection, 'fade-in-down');
+	}
 
 	//fermeture lors du clic sur le bouton considéré
 	closeButton.onclick = function () {
