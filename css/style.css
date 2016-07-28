@@ -75,55 +75,6 @@ personnalisée via des scripts.
 */
 /* début de la déclaration de style pour des éléments HTML généré par des scripts
 ----------------------------------------------------------------------------------*/
-#notify-block {
-	padding: 10px 22px 10px 10px;
-	min-height: 40px;
-	min-width: 100px;
-	max-width: 300px;
-	max-height: 100px;
-	z-index: 100;
-	overflow: hidden;
-	font-family: "DejaVu Sans", _DejaVu_Sans, verdana, OpenSans, sans-serif;
-	font-size: 0.9em;
-	border-radius: 7px 0px 0px 7px;
-	box-shadow: -1px 1px 7px rgba(103, 103, 103, 0.7);
-	position: fixed;
-	top: 20%;
-	right: 0px;
-}
-@media (max-width: 800px) {
-	#notify-block {
-		max-width: 200px;
-	}
-}
-#notify-block.notify-normal {
-	background: #f2f2f2;
-	color: #1a1a1a;
-}
-#notify-block.notify-error {
-	background: #f00;
-	color: #fff;
-}
-#notify-block.notify-error .b-dialog-close {
-	background: #fff;
-	color: #f00;
-}
-#notify-block.notify-warring {
-	background: yellow;
-	color: #f00;
-}
-#notify-block.notify-success {
-	background: #f2f2f2;
-	color: #ffa300;
-}
-#notify-block .b-dialog-close {
-	position: absolute;
-	right: 0px;
-	top: 1px;
-	width: 20px;
-	height: 20px;
-	font-size: 9px;
-}
 
 .main-fixed-block {
 	position: fixed;
