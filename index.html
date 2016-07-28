@@ -54,13 +54,36 @@
 			
 			<br />
 			<center>
-				<button><i class="octicon octicon-eye"></i> &gt; code demo</button>
+				<button onclick="openMIDialog( document.getElementById('code-demo').innerHTML)"><i class="octicon octicon-eye"></i> &gt; code demo</button>
 				<a class="i-btn" href="https://github.com/tnga/bowerder"><i class="octicon octicon-mark-github"></i> view on github</a>
 				<br />
 				<br />
 				made with <i class="octicon octicon-heart" style="color: red"></i> by <a href="https//github.com/tnga">tnga</a>
 			</center>
 		</nav>
+		
+		<div id="code-demo" data-hidden>
+			<span>What about to give more informations about libraries that powered this web page <i>(or have been loaded by bowerder here)</i> ?</span>
+			<pre>
+				<code class="lang-js hljs javascript">
+{{fnPoweredBy}}
+				</code>
+			</pre>
+			<button onclick="codeDemoView.demoPoweredBy();">run this code</button>
+		</div>
+		<div id="view-demo" data-hidden>
+			<div id="about-view">
+				<h4>love and thank to these modules:</h4>
+				<div class='i-block collection' v-for="pkg in poweredBy">
+					<h5>{{pkg.name}}</h5>
+					<p style="line-height: 25px">
+						<b v-if="pkg.authors">author(s): </b><span>{{pkg.authors.join(', ')}}</span><br/>
+						<b v-if="pkg.description">description: </b><span>{{pkg.description}}</span><br/>
+						<b v-if="pkg.homepage">homepage: </b><span>{{pkg.homepage}}</span><br/>
+					</p>
+				</div>
+			</div>
+		</div>
 
 		<script src="js/index.js"></script>
 

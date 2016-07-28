@@ -30,6 +30,29 @@ bower.import('vue', function (err) {
 			fixedIconPath: this.basePath +'/icon.png'
 		}
 	});
+	
+	codeDemoView = new Vue({
+		el: '#code-demo',
+		data: {
+			fnPoweredBy:"bower.ready( function (err) { \n\n"+
+					"\t if (err.occured) { \n"+
+			        "\t\t if (err.fromBrowser.length !== 0) console.error('Oops it seems that: '+ err.fromBrowser.join(', ') +' occured a loading error from: browser'); \n"+
+						"\t\t if (err.fromBowerder.length !== 0) console.error('Oops it seems that: '+ err.fromBowerder.join(', ') +' occured a loading error from: bowerder'); \n"+
+						"\t\t // return null; // interruption \n"+
+					"\t } \n\n"+
+					"\t var aboutV = new Vue({ \n"+
+					"\t\t el: '#about-view',\n"+
+						"\t\t data: { \n"+
+							"\t\t\t poweredBy: bower.packagesTree \n"+
+						"\t\t } \n"+
+					"\t }); \n\n"+
+					"\t openMIDialog( document.getElementById('about-view').innerHTML, '70%') ; \n"+
+				"});"
+		},
+		methods: {
+			demoPoweredBy: function () { eval( this.fnPoweredBy );}
+		}
+	});
 });
 
 bower.ready( function (err) {
@@ -55,9 +78,9 @@ bower.ready( function (err) {
 
 // first execution
 //----------------
+var codeDemoView = undefined ;
 var basePath = !bower.cdn.usage ? '.' : 'cdn.rawgit.com/tnga/bowerder/gh-pages' ;
 var dialogSectionContent = openMIDialog('<center><i class="loading"></i><br/> waiting for modules loading ...</center>') ;
- 
 //--------------------
 // end first execution
 
