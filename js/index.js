@@ -69,7 +69,8 @@ bower.ready( function (err) {
 		if (err.fromBowerder.length !== 0) errMsg += 'Oops it seems like: '+ err.fromBowerder.join(', ') +' occured a loading error from: bowerder';
 		
 		dialogSectionContent.innerHTML = '<center style="color:red">'+ errMsg.replace('\n', '<br />') +'</center>';
-		throw new Error( errMsg ) ;
+		console.error( errMsg ) ;
+		return null;
 	}
 	
 	dialogSectionContent.innerHTML = '<center style="color:green">needed modules have been successfully loaded by <b>bowerder</b></center>';
