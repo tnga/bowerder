@@ -46,7 +46,10 @@ img[alt="bowerder-logo"] {
 	border: none !important ;
 	box-shadow: none !important ;
 }
-code {line-height: 17px !important;}
+code {
+	
+	line-height: 1.3em ;
+}
 
 @keyframes spin {
 	0% {
