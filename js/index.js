@@ -1,9 +1,6 @@
 //bower.devMode = true;
 //bower.cdn.usage = true;
 
-bower.import('ijs');
-bower.import('iui', {include: ['dist/iui.min.css'], ignore: ['iui.css']});
-bower.import('font-awesome', {include: ['css/font-awesome.min.css'], ignore: ['*.scss', '*.less']});
 bower.import('reveal.js', { 
 	include: [
 		'lib/css/zenburn.css', // theme used for syntax highlighting of code
@@ -63,6 +60,10 @@ bower.import('vue', function (err) {
 		}
 	});
 });
+
+bower.import('ijs');
+bower.import('iui', {include: ['dist/iui.min.css'], ignore: ['iui.css']});
+bower.import('font-awesome', {include: ['css/font-awesome.min.css'], ignore: ['*.scss', '*.less']});
 
 bower.ready( function (err) {
 	
