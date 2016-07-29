@@ -3,6 +3,7 @@ bower.devMode = true;
 
 bower.import('ijs');
 bower.import('iui', {include: ['dist/iui.min.css'], ignore: ['iui.css']});
+bower.import('font-awesome', {include: ['css/font-awesome.min.css'], ignore: ['*.scss', '*.less']});
 bower.import('reveal.js', function (err) {
 	
 	if (err.occured) throw new Error('Oops it seems like `reveal.js` wasn\'t fully loaded by:'+ err.from) ;
