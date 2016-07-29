@@ -985,7 +985,7 @@ if (bower.components === undefined) {
       bower.browser.regTag.onreadystatechange = bower.browser.regTag.onerror = bower.browser.regTag.onload;
 
       bower.browser.regTag.setAttribute('data-bowerpkg', '#bowerder');
-      bower.browser.regTag.src = bower.dir +'/.bowerreg.js';
+      bower.browser.regTag.src = bower.dir +'/bowerreg.js';
 
       document.head.appendChild( bower.browser.regTag );
    }

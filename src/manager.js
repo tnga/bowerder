@@ -58,7 +58,7 @@ manager.genregistry = function (bowerpath) {
                   counter--;
                   if (counter === 0) { //all bower.json have been checked
 
-                     fs.writeFile( path.join( bowerpath, '.bowerreg.js'),
+                     fs.writeFile( path.join( bowerpath, 'bowerreg.js'),
                                   '//manage possible conflict with loader namespace definition. \n'+
                                   'if (typeof bower !== "undefined" && typeof bower.import !== "function" && typeof bower.addPackage !== "function") {'+
                                   ' console.warn("Seem like `bower` namespace is use for another purpose. Taking risk of an overwrite ...");'+
