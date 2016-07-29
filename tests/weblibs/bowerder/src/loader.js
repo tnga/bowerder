@@ -649,6 +649,20 @@ bower.addPackage = function (pkgName, opts) {
             else pkgConfig.browser.main = (typeof pkgConfig.main === 'string') ? [pkgConfig.main] : pkgConfig.main;
          }
          
+         // exclude developer package's target files to importation process
+         if (opts.ignore) {
+            
+            opts.ignore.forEach( function (target) {
+               
+               if (target.indexOf('*') !== -1) {
+                  
+                  target = new RegExp( target.replace('*', '\\w+') +'$');
+                  pkgConfig.browser.main = pkgConfig.browser.main.filter( function (file) { return !target.test( file ); });
+               }
+               else pkgConfig.browser.main = pkgConfig.browser.main.filter( function (file) { return target !== file; });
+            });
+         }
+         
          // include developer package's target files to importation process
          if (opts.include) pkgConfig.browser.main = pkgConfig.browser.main.concat( opts.include );
 

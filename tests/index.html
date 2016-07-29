@@ -44,6 +44,7 @@
       // package's specific version to load is only considered by the loader with online loading mode through CDN.
       bower.import("bootstrap#3.3.7" , {
         include: ["dist/css/bootstrap.min.css"],
+        ignore: ["*.less"],
         callback: function (err) {alert("bootstrap [error: "+ err.occured +"]");}
       }) ;
       bower.import("reveal.js", function (err) {alert("reveal [error: "+ err.occured +"]");}) ;
