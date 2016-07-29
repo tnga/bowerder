@@ -55,7 +55,7 @@ gulp.task('sync-loader-dev', function () {
       .pipe( notify({ title: 'bowerder-sync:', message: 'dev loader.js is now synchronized with loader.js using for test!' }) );
 });
 
-// Return the task when a file changes
+// run associated task(s) when a file change from given path
 gulp.task('watch', function () {
 
    gulp.watch( paths.sources, ['build']);
