@@ -65,6 +65,8 @@ if (typeof bower !== 'undefined' && !(bower.components instanceof Object)) {
  * indeed, for local loading, the loader will considered that, dependencies and appropriates versions will be managed by `bower` through command tools (install, update, ...).
  * targeting a package's version can be done through this syntax: `pkg-name#version` (ex: vue#1.0.26). [see](https://semver.org) for supported version sementic.
  * 
+ * developer can decide to include or exclude some package's associated files. that said, for exclusion, developer can use global selector `*` (ex: *.scss, theme-*.css) which isn't supported in inclusion case.
+ * 
  * @TODO (v0.9.0 or higher) thing about manage appropriate package's version to load (online loading mode) when have duplicate importation (seems that load the highest of two can be a good idea. ex: vue#1.0.25 < vue#1.0.26 then load vue#1.0.26)
 */
 
@@ -343,7 +345,7 @@ bower.parseTagType = function (targetFile) {
 
    if (typeof targetFile !== 'string' && !(targetFile instanceof String)) {
 
-      console.error('bowerder:parseTagType: argument must be a string' );
+      console.error('bowerder:parseTagType: argument must be a string');
       targetFile = "";
    }
 
@@ -381,7 +383,9 @@ bower.parseTagType = function (targetFile) {
  * @param   {object}   opts associated options for importation process:
  *                           `caller`: package which depends of this (argument focused by `pkgName`) given package. usefull for dependencies management,
  *                          `version`: target package's version to load (only considered for online loading through CDN),
- *                              `cbi`: index of current associated callback in callbacks's registry (if given)
+ *                              `cbi`: index of current associated callback in callbacks's registry (if given),
+ *                          `include`: an array of extra package's files to also load, 
+ *                           `ignore`: an array of package's files to exclude and not load 
  */
 bower.addPackage = function (pkgName, opts) {
 
@@ -609,6 +613,12 @@ bower.addPackage = function (pkgName, opts) {
       */
       function loadPackageConfig (pkgConfig) {
 
+         // the loader will always consider package's browser property as an object (so it can perform conversion when necessary)
+         // by default package's browser property can content a path of package's main file for browsers
+         if (typeof pkgConfig.browser === 'string') pkgConfig.browser = {main: [pkgConfig.browser]};
+         // by default package's browser property can content a paths's array of package's main files for browsers
+         if (pkgConfig.browser instanceof Array) pkgConfig.browser = {main: pkgConfig.browser};
+         // alternatively package's browser property be set as object understandable by the loader
          if (!(pkgConfig.browser instanceof Object)) pkgConfig.browser = {};
          // by default,load and execute script asynchronously
          pkgConfig.browser.async = true;
@@ -624,15 +634,13 @@ bower.addPackage = function (pkgName, opts) {
           * developers use to set associated `main` property with sources or developments files.
           * considering how web projects are now build, that pratice isn't advantageous for browsers.
           * indeed, set an `index.scss` or an unminified `index.js` files *(depending of size)* as main file isn't good for browsers to digest.
-          * that why is now recommended to also set a `browser: {main: []}` properties for mains files that browsers can easly digest.
+          * that why is now recommended to also set a `browser: []` properties for mains files that browsers can easly digest.
           * minified files with sourcemaps are specialy welcome in that case.
           * bowerder will use that properties to load component *in the DOM*; if they aren't set, it will use the `main` property. 
           * here is an example illustration for bowerder to well do it job:
           * // bower.json
           *    main: ["dist/index.scss", "dist/index.coffee"], // keep bower json spec
-          *    browser: {
-          *       main: ["dist/index.min.css", "dist/index.min.js"] // for browsers through bowerder
-          *    }
+          *    browser: ["dist/index.min.css", "dist/index.min.js"] // for browsers through bowerder
           *    ... // others properties
          */
          if (!pkgConfig.browser.main) {
@@ -642,9 +650,25 @@ bower.addPackage = function (pkgName, opts) {
                console.warn("bowerder:addPackage: there isn't main files indication for "+ pkgName);
                pkgConfig.main = [];
             }
-
-            pkgConfig.browser.main = (typeof pkgConfig.main === 'string') ? [pkgConfig.main] : pkgConfig.main;
+            else pkgConfig.browser.main = (typeof pkgConfig.main === 'string') ? [pkgConfig.main] : pkgConfig.main;
          }
+         
+         // exclude developer package's target files to importation process
+         if (opts.ignore) {
+            
+            opts.ignore.forEach( function (target) {
+               
+               if (target.indexOf('*') !== -1) {
+                  
+                  target = new RegExp('^'+ target.replace('*', '.+') +'$');
+                  pkgConfig.browser.main = pkgConfig.browser.main.filter( function (file) { return !target.test( file ); });
+               }
+               else pkgConfig.browser.main = pkgConfig.browser.main.filter( function (file) { return target !== file; });
+            });
+         }
+         
+         // include developer package's target files to importation process
+         if (opts.include) pkgConfig.browser.main = pkgConfig.browser.main.concat( opts.include );
 
          /* if `opts.caller` is set, then current loading package adress by `pkgName` is a dependency.
           * therefore, it have to be added before the `opts.caller` in the packages's configuration registry.
@@ -883,13 +907,17 @@ bower.addPackage = function (pkgName, opts) {
 /**
  * import packages "in the DOM" with their dependecies 
  * @param   {string}   pkgQuery  package's name (with a specified version, ex: name#1.0.0)
- * @param   {function} callback function to run after full package's importation
+ * @param   {function || object} options callback function to run after full package's importation
+ *                                       or an object with these properties:
+ *                                       `callback`: function to run,
+ *                                        `include`: an array of extra package's files to also load, 
+ *                                         `ignore`: an array of package's files to exclude and not load 
 */
-bower.import = function (pkgQuery, callback) {
+bower.import = function (pkgQuery, options) {
 
    if (typeof pkgQuery !== 'string' && !(pkgQuery instanceof String)) {
 
-      console.error('bowerder:import: argument must be a string' );
+      console.error('bowerder:import: first argument must be a string' );
       return null;
    }
    
@@ -898,39 +926,44 @@ bower.import = function (pkgQuery, callback) {
    var pkgq = {name: pkgQuery[0], version: pkgQuery[1]};
    // given query is normaly a string so re-formatting is welcome after above manipulations
    pkgQuery = pkgQuery.join('#');
+   
+   var callback = undefined;
+   var cbIndex = undefined; // callback index
+   var fileOpts = {include: [], ignore: []};
+
+   if (options) {
+      
+      if (typeof options === 'function' || options instanceof Function) {
+         
+         callback = options;
+      }
+      else if (options instanceof Object) {
+         
+         if (typeof options.callback === 'function') callback = options.callback; else if(options.callback) console.error('bowerder:import('+ pkgq.name +'): `callback` must be a function');
+         if (options.include instanceof Array) fileOpts.include = options.include; else if(options.include) console.error('bowerder:import('+ pkgq.name +'): `include` must be an array');
+         if (options.ignore instanceof Array) fileOpts.ignore = options.ignore; else if(options.ignore) console.error('bowerder:import('+ pkgq.name +'): `ignore` must be an array');
+      }
+      else console.error('bowerder:import: second argument must be a function or an object');
+   }
 
    if (callback) {
 
-      if (typeof callback !== 'function' && !(callback instanceof Function)) {
+      if (!bower.callbacks[ pkgq.name ]) bower.callbacks[ pkgq.name ] = [];
 
-         console.warn('bowerder:import: argument must be a function' );
-      }
-      else {
+      bower.callbacks[ pkgq.name ].push( callback );
 
-         if (!bower.callbacks[ pkgq.name ]) bower.callbacks[ pkgq.name ] = [];
-
-         bower.callbacks[ pkgq.name ].push( callback );
-
-         /* with current import's process, callback which is added to the callbacks's registry have the last index.
-          * that index is keeped and will be use to access to that callback if necessary in certains conditions.
-          * loader will be able to import package when the bower components's local registry state will be determinate.
-         */
-         if (!(bower.components instanceof Object) && bower.components !== null) {
-
-            bower.browser.waitingImport.push( {name: pkgq.name, version: pkgq.version, cbi: (bower.callbacks[ pkgq.name ].length - 1)} );
-         }
-         else bower.addPackage( pkgq.name, {version: pkgq.version, cbi: (bower.callbacks[ pkgq.name ].length - 1)} );
-      }
+      /* with current import's process, callback which is added to the callbacks's registry have the last index.
+       * that index is keeped and will be use to access to that callback if necessary in certains conditions.
+      */
+      cbIndex = bower.callbacks[ pkgq.name ].length - 1;
    }
-   else {
+   
+   // loader will be able to import package when the bower components's local registry state will be determinated.
+   if (!(bower.components instanceof Object) && bower.components !== null) {
 
-      if (!(bower.components instanceof Object) && bower.components !== null) {
-
-         bower.browser.waitingImport.push( {name: pkgq.name, version: pkgq.version, cbi: undefined} );
-      }
-      else bower.addPackage( pkgq.name, {version: pkgq.version} );
-   } 
-
+      bower.browser.waitingImport.push( {name: pkgq.name, version: pkgq.version, include: fileOpts.include, ignore: fileOpts.ignore, cbi: cbIndex} );
+   }
+   else bower.addPackage( pkgq.name, {version: pkgq.version, include: fileOpts.include, ignore: fileOpts.ignore, cbi: cbIndex} );
 };
 
 
@@ -978,7 +1011,7 @@ if (bower.components === undefined) {
 
          bower.browser.waitingImport.forEach( function (pkgInfo) {
 
-            bower.addPackage( pkgInfo.name, {version:  pkgInfo.version, cbi: pkgInfo.cbi} );
+            bower.addPackage( pkgInfo.name, {version:  pkgInfo.version, include: pkgInfo.include, ignore: pkgInfo.ignore, cbi: pkgInfo.cbi} );
          });
          bower.browser.waitingImport = [];
       };

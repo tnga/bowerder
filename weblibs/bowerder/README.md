@@ -60,8 +60,8 @@ bower.ready( function (err) {
 
    if (err.occured) {
       //you can know which package have occured an error and if it is from bowerder or browser loading process ;)
-      if (err.fromBrowser.length !==0) console.error('Oops it seems like: '+ err.fromBrowser.join(', ') +' occured a loading error from: browser');
-      if (err.fromBowerder.length !==0) console.error('Oops it seems like: '+ err.fromBowerder.join(', ') +' occured a loading error from: bowerder');
+      if (err.fromBrowser.length !== 0) console.error('Oops it seems like: '+ err.fromBrowser.join(', ') +' occured a loading error from: browser');
+      if (err.fromBowerder.length !== 0) console.error('Oops it seems like: '+ err.fromBowerder.join(', ') +' occured a loading error from: bowerder');
       return null; // interruption 
    }
 
@@ -86,6 +86,22 @@ bower.import("aos") ;
 bower.ready( function (err) {
 
    alert("after all previous importation. [error: "+ err.occured +"]") ;
+}) ;
+```
+
+Developer can decide to include or exclude some package's associated files. That said, for exclusion, developer can use global selector `*` (ex: `*.scss`, `theme-*.css`) which isn't supported in inclusion case.
+*(Just take a look at the code below)*.
+```js
+bower.import("bootstrap#3.3.7" , {
+   include: ["dist/css/bootstrap.min.css"],
+   ignore: ["less/bootstrap.less"],
+   callback: function (err) {alert("bootstrap [error: "+ err.occured +"]");}
+}) ;
+
+bower.import("font-awesome" , {
+   include: ["css/font-awesome.min.css"],
+   ignore: ["*.less", "*.scss"],
+   callback: function (err) {if (!err.occured) alert("awesome font have been well loaded");}
 }) ;
 ```
 
@@ -128,8 +144,8 @@ In the browser, packages's configurations can be access via the `bower.component
 bower.ready( function (err) {
 
    if (err.occured) {
-      if (err.fromBrowser.length !==0) console.error('Oops it seems that: '+ err.fromBrowser.join(', ') +' occured a loading error from: browser');
-      if (err.fromBowerder.length !==0) console.error('Oops it seems that: '+ err.fromBowerder.join(', ') +' occured a loading error from: bowerder');
+      if (err.fromBrowser.length !== 0) console.error('Oops it seems that: '+ err.fromBrowser.join(', ') +' occured a loading error from: browser');
+      if (err.fromBowerder.length !== 0) console.error('Oops it seems that: '+ err.fromBowerder.join(', ') +' occured a loading error from: bowerder');
       return null; // interruption 
    }
 
@@ -147,7 +163,7 @@ bower.ready( function (err) {
    <div class='card-panel' v-for="pkg in poweredBy">
       <h5 class='card-title'>{{pkg.name}}</h5>
       <div class='card-content'>
-         <b>author: </b><span>{{pkg.authors[].join(', ')}}</span><br/>
+         <b>author(s): </b><span>{{pkg.authors.join(', ')}}</span><br/>
          <b>description: </b><span>{{pkg.description}}</span><br/>
          <b>homepage: </b><span>{{pkg.homepage}}</span><br/>
       </div>
@@ -159,7 +175,7 @@ When the local registry isn't available or updated, bowerder will try to load pa
 The `data-bowerreg` attribute in the bowerder's script tag also contribute to the magic; without it, 
 developer will have to manually include the local registry and set the bower components directory of the project.
 ```js
-   bower.dir = 'path-to-bower-components-dir';
+bower.dir = 'path-to-bower-components-dir';
 ```
 
 Enable the *development mode* is recommended if you want all print's trace of the loading process's warnings/errors.
@@ -197,11 +213,11 @@ $ gulp watch
 Minification is a way for developer to have for some files a better loading optimization. However, `bower.json` spec do not allow to use minified files as mains files for a component.
 Developers use to set associated `main` property with sources or developments files. Considering how web projects are now build, that pratice isn't advantageous for browsers.
 Indeed, set an `index.scss`, `index.coffee` or an unminified `index.js` files *(depending of size)* for production as main files isn't actually good for browsers to digest.
-That why bowerder now recommended to also set a `browser: {main: []}` properties for mains files that browsers can easly digest. Minified files with sourcemaps are specialy welcome in that case.
+That why bowerder now recommended to also set a `browser: []` *(or `browser: {main: []}`)* property for mains files that browsers can easly digest. Minified files with sourcemaps are specialy welcome in that case.
 
 > If you like this module, you can give it a star and try to *pull request* to some libraries's repository like [bootstrap](http://github.com/twbs/bootstrap) which don't yet respect that behavior.
 
-bowerder will use `browser: {main: []}` properties to load component's main files; if they aren't set, it will use the `main` property as default. 
+bowerder will use `browser: []` properties to load component's main files; if they aren't set, it will use the `main` property as default. 
 
 **showcase**: *[font-awesome](http:////github.com/FortAwesome/Font-Awesome)'s* `bower.json`
 ```json
@@ -209,9 +225,7 @@ bowerder will use `browser: {main: []}` properties to load component's main file
    "less/font-awesome.less",
    "scss/font-awesome.scss"
 ],
-"browser": {
-   "main": ["css/font-awesome.min.css"]
-}
+"browser": ["css/font-awesome.min.css"]
 ```
 Some libraries don't have that problem since their main files are distributions files.
  - *[aos](http://github.com/michalsnik/aos)'s* `bower.json`

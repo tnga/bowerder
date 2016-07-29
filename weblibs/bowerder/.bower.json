@@ -36,15 +36,15 @@
     "test",
     "tests"
   ],
-  "version": "0.5.0",
-  "_release": "0.5.0",
+  "version": "0.7.0",
+  "_release": "0.7.0",
   "_resolution": {
     "type": "version",
-    "tag": "0.5.0",
-    "commit": "6130fd6090fa2262369b5933ba62efc67897a8ff"
+    "tag": "0.7.0",
+    "commit": "445baf24a4a2553e465f5c4c369838524e1d292d"
   },
   "_source": "https://github.com/tnga/bowerder.git",
-  "_target": "~0.5.0",
+  "_target": "~0.7.0",
   "_originalSource": "bowerder",
   "_direct": true
 }
