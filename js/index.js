@@ -1,25 +1,32 @@
-bower.devMode = true;
+//bower.devMode = true;
 //bower.cdn.usage = true;
 
 bower.import('ijs');
 bower.import('iui', {include: ['dist/iui.min.css'], ignore: ['iui.css']});
 bower.import('font-awesome', {include: ['css/font-awesome.min.css'], ignore: ['*.scss', '*.less']});
-bower.import('reveal.js', function (err) {
+bower.import('reveal.js', { 
+	include: [
+		'lib/css/zenburn.css', // theme used for syntax highlighting of code
+		'css/theme/white.css', //  particular reveal's theme
+		window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css' // style for Printing and PDF exports
+	],
+	callback: function (err) {
 	
-	if (err.occured) throw new Error('Oops it seems like `reveal.js` wasn\'t fully loaded by:'+ err.from) ;
-	
-	// More info https://github.com/hakimel/reveal.js#configuration
-	Reveal.initialize({
-		history: true,
+		if (err.occured) throw new Error('Oops it seems like `reveal.js` wasn\'t fully loaded by:'+ err.from) ;
 
-		// More info https://github.com/hakimel/reveal.js#dependencies
-		dependencies: [
-			{ src: basePath +'/weblibs/reveal.js/plugin/markdown/marked.js' },
-			{ src: basePath +'/weblibs/reveal.js/plugin/markdown/markdown.js', callback: function() { document.getElementById('bowerder-logo').src = basePath +'/bowerder.png' } },
-			//{ src: basePath +'/plugin/notes/notes.js', async: true },
-			{ src: basePath+ '/weblibs/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlighting(); } }
-		]
-	});
+		// More info https://github.com/hakimel/reveal.js#configuration
+		Reveal.initialize({
+			history: true,
+
+			// More info https://github.com/hakimel/reveal.js#dependencies
+			dependencies: [
+				{ src: basePath +'/weblibs/reveal.js/plugin/markdown/marked.js' },
+				{ src: basePath +'/weblibs/reveal.js/plugin/markdown/markdown.js', callback: function() { document.getElementById('bowerder-logo').src = basePath +'/bowerder.png' } },
+				//{ src: basePath +'/plugin/notes/notes.js', async: true },
+				{ src: basePath+ '/weblibs/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlighting(); } }
+			]
+		});
+	}
 });
 bower.import('vue', function (err) {
 	
