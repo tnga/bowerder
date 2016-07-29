@@ -11,10 +11,11 @@ bower.import('reveal.js', {
 	
 		if (err.occured) throw new Error('Oops it seems like `reveal.js` wasn\'t fully loaded by:'+ err.from) ;
 
+		document.querySelector("section[data-readme]").setAttribute('data-markdown', basePath +'/README.md')
 		// More info https://github.com/hakimel/reveal.js#configuration
 		Reveal.initialize({
 			history: true,
-
+			// autoSlide: 10000,
 			// More info https://github.com/hakimel/reveal.js#dependencies
 			dependencies: [
 				{ src: basePath +'/weblibs/reveal.js/plugin/markdown/marked.js' },
@@ -90,7 +91,8 @@ bower.ready( function (err) {
 		return null;
 	}
 	
-	dialogSectionContent.innerHTML = '<center style="color:green">needed modules have been successfully loaded by <b>bowerder</b></center>';
+	dialogSectionContent.innerHTML = '<center><span style="color:green">needed modules have been successfully loaded by <b>bowerder</b></span>'+
+									'<br/><br/><small><b>Tip</b>: just slide or use space/arrows keys to navigate</small></center>';
 });
 
 
