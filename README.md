@@ -89,6 +89,22 @@ bower.ready( function (err) {
 }) ;
 ```
 
+Developer can decide to include or exclude some package's associated files. That said, for exclusion, developer can use global selector `*` (ex: *.scss, theme-*.css) which isn't supported in inclusion case.
+*(Just take a look at the code below)*.
+```js
+bower.import("bootstrap#3.3.7" , {
+   include: ["dist/css/bootstrap.min.css"],
+   ignore: ["less/bootstrap.less"],
+   callback: function (err) {alert("bootstrap [error: "+ err.occured +"]");}
+}) ;
+
+bower.import("font-awesome" , {
+   include: ["css/font-awesome.min.css"],
+   ignore: ["*.less", "*.scss"],
+   callback: function (err) {if (!err.occured) alert("awesome font have been well loaded");}
+}) ;
+```
+
 *You have a custom external scripts or stylesheets for your project which use or overwrite some packages's features ?*
 Don't worry, just simply include them and bowerder will import packages's main files before their loading;
 so that it will be like you have done it by yourself.
