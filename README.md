@@ -1,7 +1,7 @@
 ## bowerder
 > the bower components loader for browsers
 
-<p style="text-align:center"> <img alt="bowerder-logo" src="bowerder.png" id="bowerder-logo" /> </p>
+<p align="center"><img alt="bowerder-logo" src="bowerder.png" id="bowerder-logo" /></p>
 Easly Import your components or libraries installed via bower to your project.
 
 
@@ -105,6 +105,23 @@ bower.ready( function (err) {
 ```
 
 
+Developer can decide to include or exclude some package's associated files. That said, for exclusion, developer can use global selector `*` (ex: `*.scss`, `theme-*.css`) which isn't supported in inclusion case.
+*(Just take a look at the code below)*.
+```js
+bower.import("bootstrap#3.3.7" , {
+   include: ["dist/css/bootstrap.min.css"],
+   ignore: ["less/bootstrap.less"],
+   callback: function (err) {alert("bootstrap [error: "+ err.occured +"]");}
+}) ;
+
+bower.import("font-awesome" , {
+   include: ["css/font-awesome.min.css"],
+   ignore: ["*.less", "*.scss"],
+   callback: function (err) {if (!err.occured) alert("awesome font have been well loaded");}
+}) ;
+```
+
+
 *You have a custom external scripts or stylesheets for your project which use or overwrite some packages's features ?*
 Don't worry, just simply include them and bowerder will import packages's main files before their loading;
 so that it will be like you have done it by yourself.
@@ -178,7 +195,7 @@ bower.ready( function (err) {
    <div class='card-panel' v-for="pkg in poweredBy">
       <h5 class='card-title'>{{pkg.name}}</h5>
       <div class='card-content'>
-         <b>author: </b><span>{{pkg.authors.join(', ')}}</span><br/>
+         <b>author(s): </b><span>{{pkg.authors.join(', ')}}</span><br/>
          <b>description: </b><span>{{pkg.description}}</span><br/>
          <b>homepage: </b><span>{{pkg.homepage}}</span><br/>
       </div>
@@ -191,7 +208,7 @@ When the local registry isn't available or updated, bowerder will try to load pa
 The `data-bowerreg` attribute in the bowerder's script tag also contribute to the magic; without it, 
 developer will have to manually include the local registry and set the bower components directory of the project.
 ```js
-   bower.dir = 'path-to-bower-components-dir';
+bower.dir = 'path-to-bower-components-dir';
 ```
 
 
@@ -236,12 +253,12 @@ Developers use to set associated `main` property with sources or developments fi
 
 
 Indeed, set an `index.scss`, `index.coffee` or an unminified `index.js` files *(depending of size)* for production as main files isn't actually good for browsers to digest.
-That why bowerder now recommended to also set a `browser: {main: []}` properties for mains files that browsers can easly digest. Minified files with sourcemaps are specialy welcome in that case.
+That why bowerder now recommended to also set a `browser: []` *(or `browser: {main: []}`)* property for mains files that browsers can easly digest. Minified files with sourcemaps are specialy welcome in that case.
 
 
 > If you like this module, you can give it a star and try to *pull request* to some libraries's repository like [bootstrap](http://github.com/twbs/bootstrap) which don't yet respect that behavior.
 
-bowerder will use `browser: {main: []}` properties to load component's main files; if they aren't set, it will use the `main` property as default. 
+bowerder will use `browser: []` properties to load component's main files; if they aren't set, it will use the `main` property as default. 
 
 
 **showcase**: *[font-awesome](http:////github.com/FortAwesome/Font-Awesome)'s* `bower.json`
@@ -250,9 +267,7 @@ bowerder will use `browser: {main: []}` properties to load component's main file
    "less/font-awesome.less",
    "scss/font-awesome.scss"
 ],
-"browser": {
-   "main": ["css/font-awesome.min.css"]
-}
+"browser": ["css/font-awesome.min.css"]
 ```
 Some libraries don't have that problem since their main files are distributions files.
 
