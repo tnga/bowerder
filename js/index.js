@@ -1,3 +1,4 @@
+//bower.devMode = true;
 //bower.cdn.usage = true;
 
 bower.import('ijs');
