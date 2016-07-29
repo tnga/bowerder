@@ -89,7 +89,7 @@ bower.ready( function (err) {
 }) ;
 ```
 
-Developer can decide to include or exclude some package's associated files. That said, for exclusion, developer can use global selector `*` (ex: *.scss, theme-*.css) which isn't supported in inclusion case.
+Developer can decide to include or exclude some package's associated files. That said, for exclusion, developer can use global selector `*` (ex: `*.scss`, `theme-*.css`) which isn't supported in inclusion case.
 *(Just take a look at the code below)*.
 ```js
 bower.import("bootstrap#3.3.7" , {
@@ -144,8 +144,8 @@ In the browser, packages's configurations can be access via the `bower.component
 bower.ready( function (err) {
 
    if (err.occured) {
-      if (err.fromBrowser.length !==0) console.error('Oops it seems that: '+ err.fromBrowser.join(', ') +' occured a loading error from: browser');
-      if (err.fromBowerder.length !==0) console.error('Oops it seems that: '+ err.fromBowerder.join(', ') +' occured a loading error from: bowerder');
+      if (err.fromBrowser.length !== 0) console.error('Oops it seems that: '+ err.fromBrowser.join(', ') +' occured a loading error from: browser');
+      if (err.fromBowerder.length !== 0) console.error('Oops it seems that: '+ err.fromBowerder.join(', ') +' occured a loading error from: bowerder');
       return null; // interruption 
    }
 
@@ -163,7 +163,7 @@ bower.ready( function (err) {
    <div class='card-panel' v-for="pkg in poweredBy">
       <h5 class='card-title'>{{pkg.name}}</h5>
       <div class='card-content'>
-         <b>author: </b><span>{{pkg.authors[].join(', ')}}</span><br/>
+         <b>author(s): </b><span>{{pkg.authors.join(', ')}}</span><br/>
          <b>description: </b><span>{{pkg.description}}</span><br/>
          <b>homepage: </b><span>{{pkg.homepage}}</span><br/>
       </div>
@@ -175,7 +175,7 @@ When the local registry isn't available or updated, bowerder will try to load pa
 The `data-bowerreg` attribute in the bowerder's script tag also contribute to the magic; without it, 
 developer will have to manually include the local registry and set the bower components directory of the project.
 ```js
-   bower.dir = 'path-to-bower-components-dir';
+bower.dir = 'path-to-bower-components-dir';
 ```
 
 Enable the *development mode* is recommended if you want all print's trace of the loading process's warnings/errors.
