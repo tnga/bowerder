@@ -4,7 +4,7 @@
   "description": "the bower components loader for browsers",
   "main": "./src/manager.js",
   "bin": {
-    bowerder: "./bin/bowerder"
+    "bowerder": "./bin/bowerder"
   },
   "engines": {
     "node": ">=0.10.0"
