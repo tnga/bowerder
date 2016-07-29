@@ -1,7 +1,7 @@
 //bower.devMode = true;
 //bower.cdn.usage = true;
 
-bower.import('reveal.js', { 
+bower.import('reveal.js#3.3.0', { 
 	include: [
 		'lib/css/zenburn.css', // theme used for syntax highlighting of code
 		'css/theme/white.css', //  particular reveal's theme
@@ -26,7 +26,7 @@ bower.import('reveal.js', {
 		});
 	}
 });
-bower.import('vue', function (err) {
+bower.import('vue#1.0.26', function (err) {
 	
 	if (err.occured) throw new Error('Oops it seems like `vue` wasn\'t fully loaded by:'+ err.from) ;
 	
@@ -62,9 +62,9 @@ bower.import('vue', function (err) {
 	});
 });
 
-bower.import('ijs');
-bower.import('iui', {include: ['dist/iui.min.css'], ignore: ['iui.css']});
-bower.import('font-awesome', {include: ['css/font-awesome.min.css'], ignore: ['*.scss', '*.less']});
+bower.import('ijs#0.99.7');
+bower.import('iui#0.0.0', {include: ['dist/iui.min.css'], ignore: ['iui.css']});
+bower.import('font-awesome#4.6.3', {include: ['css/font-awesome.min.css'], ignore: ['*.scss', '*.less']});
 
 bower.ready( function (err) {
 	
