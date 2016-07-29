@@ -343,7 +343,7 @@ bower.parseTagType = function (targetFile) {
 
    if (typeof targetFile !== 'string' && !(targetFile instanceof String)) {
 
-      console.error('bowerder:parseTagType: argument must be a string' );
+      console.error('bowerder:parseTagType: argument must be a string');
       targetFile = "";
    }
 
@@ -648,6 +648,9 @@ bower.addPackage = function (pkgName, opts) {
             }
             else pkgConfig.browser.main = (typeof pkgConfig.main === 'string') ? [pkgConfig.main] : pkgConfig.main;
          }
+         
+         // include developer package's target files to importation process
+         if (opts.include) pkgConfig.browser.main = pkgConfig.browser.main.concat( opts.include );
 
          /* if `opts.caller` is set, then current loading package adress by `pkgName` is a dependency.
           * therefore, it have to be added before the `opts.caller` in the packages's configuration registry.
@@ -888,11 +891,11 @@ bower.addPackage = function (pkgName, opts) {
  * @param   {string}   pkgQuery  package's name (with a specified version, ex: name#1.0.0)
  * @param   {function} callback function to run after full package's importation
 */
-bower.import = function (pkgQuery, callback) {
+bower.import = function (pkgQuery, options) {
 
    if (typeof pkgQuery !== 'string' && !(pkgQuery instanceof String)) {
 
-      console.error('bowerder:import: argument must be a string' );
+      console.error('bowerder:import: first argument must be a string' );
       return null;
    }
    
@@ -901,39 +904,44 @@ bower.import = function (pkgQuery, callback) {
    var pkgq = {name: pkgQuery[0], version: pkgQuery[1]};
    // given query is normaly a string so re-formatting is welcome after above manipulations
    pkgQuery = pkgQuery.join('#');
+   
+   var callback = undefined;
+   var cbIndex = undefined;
+   var fileOpts = {include: [], ignore: []};
+
+   if (options) {
+      
+      if (typeof options === 'function' || options instanceof Function) {
+         
+         callback = options;
+      }
+      else if (options instanceof Object) {
+         
+         if (typeof options.callback === 'function') callback = options.callback; else if(options.callback) console.error('bowerder:import('+ pkgq.name +'): `callback` must be a function');
+         if (options.include instanceof Array) fileOpts.include = options.include; else if(options.include) console.error('bowerder:import('+ pkgq.name +'): `include` must be an array');
+         if (options.ignore instanceof Array) fileOpts.ignore = options.ignore; else if(options.ignore) console.error('bowerder:import('+ pkgq.name +'): `ignore` must be an array');
+      }
+      else console.error('bowerder:import: second argument must be a function or an object');
+   }
 
    if (callback) {
 
-      if (typeof callback !== 'function' && !(callback instanceof Function)) {
+      if (!bower.callbacks[ pkgq.name ]) bower.callbacks[ pkgq.name ] = [];
 
-         console.warn('bowerder:import: argument must be a function' );
-      }
-      else {
+      bower.callbacks[ pkgq.name ].push( callback );
 
-         if (!bower.callbacks[ pkgq.name ]) bower.callbacks[ pkgq.name ] = [];
-
-         bower.callbacks[ pkgq.name ].push( callback );
-
-         /* with current import's process, callback which is added to the callbacks's registry have the last index.
-          * that index is keeped and will be use to access to that callback if necessary in certains conditions.
-          * loader will be able to import package when the bower components's local registry state will be determinate.
-         */
-         if (!(bower.components instanceof Object) && bower.components !== null) {
-
-            bower.browser.waitingImport.push( {name: pkgq.name, version: pkgq.version, cbi: (bower.callbacks[ pkgq.name ].length - 1)} );
-         }
-         else bower.addPackage( pkgq.name, {version: pkgq.version, cbi: (bower.callbacks[ pkgq.name ].length - 1)} );
-      }
+      /* with current import's process, callback which is added to the callbacks's registry have the last index.
+       * that index is keeped and will be use to access to that callback if necessary in certains conditions.
+      */
+      cbIndex = bower.callbacks[ pkgq.name ].length - 1;
    }
-   else {
+   
+   // loader will be able to import package when the bower components's local registry state will be determinated.
+   if (!(bower.components instanceof Object) && bower.components !== null) {
 
-      if (!(bower.components instanceof Object) && bower.components !== null) {
-
-         bower.browser.waitingImport.push( {name: pkgq.name, version: pkgq.version, cbi: undefined} );
-      }
-      else bower.addPackage( pkgq.name, {version: pkgq.version} );
-   } 
-
+      bower.browser.waitingImport.push( {name: pkgq.name, version: pkgq.version, include: fileOpts.include, ignore: fileOpts.ignore, cbi: cbIndex} );
+   }
+   else bower.addPackage( pkgq.name, {version: pkgq.version, include: fileOpts.include, ignore: fileOpts.ignore, cbi: cbIndex} );
 };
 
 
@@ -981,7 +989,7 @@ if (bower.components === undefined) {
 
          bower.browser.waitingImport.forEach( function (pkgInfo) {
 
-            bower.addPackage( pkgInfo.name, {version:  pkgInfo.version, cbi: pkgInfo.cbi} );
+            bower.addPackage( pkgInfo.name, {version:  pkgInfo.version, include: pkgInfo.include, ignore: pkgInfo.ignore, cbi: pkgInfo.cbi} );
          });
          bower.browser.waitingImport = [];
       };

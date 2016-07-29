@@ -42,7 +42,10 @@
       // bootstrap depend of jquery, so this line isn't needed.
       // this is to show flexibility in case of duplicate component's importation.
       // package's specific version to load is only considered by the loader with online loading mode through CDN.
-      bower.import("bootstrap#3.3.7" , function (err) {alert("bootstrap [error: "+ err.occured +"]");}) ;
+      bower.import("bootstrap#3.3.7" , {
+        include: ["dist/css/bootstrap.min.css"],
+        callback: function (err) {alert("bootstrap [error: "+ err.occured +"]");}
+      }) ;
       bower.import("reveal.js", function (err) {alert("reveal [error: "+ err.occured +"]");}) ;
       bower.import("font-awesome", function (err) {alert("font-awesome [error: "+ err.occured +"]");}) ;
       bower.import("ijs", function (err) {alert("ijs [error: "+ err.occured +"]");}) ;
