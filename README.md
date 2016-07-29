@@ -12,7 +12,7 @@ Easly Import your components or libraries installed via bower to your project.
  
 Indeed, [**bower**](http://bower.io) is the package manager, but without a good loader's utility, package's dependency and module philosophy are under-exploited with usage of a simple `script` or `link` tag.
 A best example to explain what i'm talking about is the comparison with node modules usage. 
-Although conditions are a little differents, here is a place to better manage component we use through bower in our project.
+Although conditions are a little differents, here is a place to better manage components we use through bower in our project.
  
 #### how to install ?
 
@@ -22,7 +22,7 @@ $ bower install --save bowerder
 ```
 
 don't forget the associated small and useful command line tool : 
-*(**note**: global installation need `sudo` mode for some Linux distributions)*
+*(**note**: global installation need `sudo` mode for some GNU/Linux distributions)*
 ```sh
 $ npm install -g bowerder
 ```

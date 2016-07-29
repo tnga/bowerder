@@ -20,8 +20,8 @@ var manager = {};
  */
 manager.genregistry = function (bowerpath) {
 
-   var counter = 0; //will be use to now if all package's `bower.json` have been checked
-   var bowerreg = {}; //will be use as bower components registry for considered project
+   var counter = 0 ; // will be used to know if all `bower.json` of packages have been checked
+   var bowerreg = {} ; // will be used as bower components registry for considered project
 
    fs.readdir( bowerpath, function (err, files) {
 
