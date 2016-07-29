@@ -11,7 +11,7 @@ bower.import('reveal.js', {
 	
 		if (err.occured) throw new Error('Oops it seems like `reveal.js` wasn\'t fully loaded by:'+ err.from) ;
 
-		document.querySelector("section[data-readme]").setAttribute('data-markdown', basePath +'/README.md')
+		document.querySelector("section[data-readme]").setAttribute('data-markdown', basePath +'/MASTER.md')
 		// More info https://github.com/hakimel/reveal.js#configuration
 		Reveal.initialize({
 			history: true,
