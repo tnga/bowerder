@@ -660,7 +660,8 @@ bower.addPackage = function (pkgName, opts) {
                
                if (target.indexOf('*') !== -1) {
                   
-                  target = new RegExp( target.replace('*', '\\w+') +'$');
+                  target = new RegExp('^'+ target.replace('*', '.+') +'$');
+                  console.log(target);
                   pkgConfig.browser.main = pkgConfig.browser.main.filter( function (file) { return !target.test( file ); });
                }
                else pkgConfig.browser.main = pkgConfig.browser.main.filter( function (file) { return target !== file; });
