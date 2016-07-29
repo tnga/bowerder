@@ -99,7 +99,7 @@ bower.ready( function (err) {
 // first execution
 //----------------
 var codeDemoView = undefined ;
-var basePath = !bower.cdn.usage ? '.' : 'cdn.rawgit.com/tnga/bowerder/gh-pages' ;
+var basePath = !bower.cdn.usage ? '.' : 'https://cdn.rawgit.com/tnga/bowerder/gh-pages' ;
 var dialogSectionContent = openMIDialog('<center><i class="loading"></i><br/> waiting for modules loading ...</center>') ;
 //--------------------
 // end first execution
