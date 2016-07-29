@@ -667,9 +667,14 @@ bower.addPackage = function (pkgName, opts) {
             });
          }
          
-         // include developer package's target files to importation process
-         if (opts.include) pkgConfig.browser.main = pkgConfig.browser.main.concat( opts.include );
-
+         if (opts.include) {
+            
+            // inclusion's unicity: because package's main files are already included
+            opts.include = opts.include.filter( function (target) { return pkgConfig.browser.main.indexOf( target ) === -1; });
+            // include developer package's target files to importation process
+            pkgConfig.browser.main = pkgConfig.browser.main.concat( opts.include );
+         }
+         
          /* if `opts.caller` is set, then current loading package adress by `pkgName` is a dependency.
           * therefore, it have to be added before the `opts.caller` in the packages's configuration registry.
           * else it's just a package to add in the considered registry.
