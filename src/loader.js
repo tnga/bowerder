@@ -609,6 +609,12 @@ bower.addPackage = function (pkgName, opts) {
       */
       function loadPackageConfig (pkgConfig) {
 
+         // the loader will always consider package's browser property as an object (so it can perform conversion when necessary)
+         // by default package's browser property can content a path of package's main file for browsers
+         if (typeof pkgConfig.browser === 'string') pkgConfig.browser = {main: [pkgConfig.browser]};
+         // by default package's browser property can content a paths's array of package's main files for browsers
+         if (pkgConfig.browser instanceof Array) pkgConfig.browser = {main: pkgConfig.browser};
+         // alternatively package's browser property be set as object understandable by the loader
          if (!(pkgConfig.browser instanceof Object)) pkgConfig.browser = {};
          // by default,load and execute script asynchronously
          pkgConfig.browser.async = true;
@@ -624,15 +630,13 @@ bower.addPackage = function (pkgName, opts) {
           * developers use to set associated `main` property with sources or developments files.
           * considering how web projects are now build, that pratice isn't advantageous for browsers.
           * indeed, set an `index.scss` or an unminified `index.js` files *(depending of size)* as main file isn't good for browsers to digest.
-          * that why is now recommended to also set a `browser: {main: []}` properties for mains files that browsers can easly digest.
+          * that why is now recommended to also set a `browser: []` properties for mains files that browsers can easly digest.
           * minified files with sourcemaps are specialy welcome in that case.
           * bowerder will use that properties to load component *in the DOM*; if they aren't set, it will use the `main` property. 
           * here is an example illustration for bowerder to well do it job:
           * // bower.json
           *    main: ["dist/index.scss", "dist/index.coffee"], // keep bower json spec
-          *    browser: {
-          *       main: ["dist/index.min.css", "dist/index.min.js"] // for browsers through bowerder
-          *    }
+          *    browser: ["dist/index.min.css", "dist/index.min.js"] // for browsers through bowerder
           *    ... // others properties
          */
          if (!pkgConfig.browser.main) {
@@ -642,8 +646,7 @@ bower.addPackage = function (pkgName, opts) {
                console.warn("bowerder:addPackage: there isn't main files indication for "+ pkgName);
                pkgConfig.main = [];
             }
-
-            pkgConfig.browser.main = (typeof pkgConfig.main === 'string') ? [pkgConfig.main] : pkgConfig.main;
+            else pkgConfig.browser.main = (typeof pkgConfig.main === 'string') ? [pkgConfig.main] : pkgConfig.main;
          }
 
          /* if `opts.caller` is set, then current loading package adress by `pkgName` is a dependency.

@@ -197,11 +197,11 @@ $ gulp watch
 Minification is a way for developer to have for some files a better loading optimization. However, `bower.json` spec do not allow to use minified files as mains files for a component.
 Developers use to set associated `main` property with sources or developments files. Considering how web projects are now build, that pratice isn't advantageous for browsers.
 Indeed, set an `index.scss`, `index.coffee` or an unminified `index.js` files *(depending of size)* for production as main files isn't actually good for browsers to digest.
-That why bowerder now recommended to also set a `browser: {main: []}` properties for mains files that browsers can easly digest. Minified files with sourcemaps are specialy welcome in that case.
+That why bowerder now recommended to also set a `browser: []` *(or `browser: {main: []}`)* property for mains files that browsers can easly digest. Minified files with sourcemaps are specialy welcome in that case.
 
 > If you like this module, you can give it a star and try to *pull request* to some libraries's repository like [bootstrap](http://github.com/twbs/bootstrap) which don't yet respect that behavior.
 
-bowerder will use `browser: {main: []}` properties to load component's main files; if they aren't set, it will use the `main` property as default. 
+bowerder will use `browser: []` properties to load component's main files; if they aren't set, it will use the `main` property as default. 
 
 **showcase**: *[font-awesome](http:////github.com/FortAwesome/Font-Awesome)'s* `bower.json`
 ```json
@@ -209,9 +209,7 @@ bowerder will use `browser: {main: []}` properties to load component's main file
    "less/font-awesome.less",
    "scss/font-awesome.scss"
 ],
-"browser": {
-   "main": ["css/font-awesome.min.css"]
-}
+"browser": ["css/font-awesome.min.css"]
 ```
 Some libraries don't have that problem since their main files are distributions files.
  - *[aos](http://github.com/michalsnik/aos)'s* `bower.json`
