@@ -60,8 +60,8 @@ bower.ready( function (err) {
 
    if (err.occured) {
       //you can know which package have occured an error and if it is from bowerder or browser loading process ;)
-      if (err.fromBrowser.length !==0) console.error('Oops it seems like: '+ err.fromBrowser.join(', ') +' occured a loading error from: browser');
-      if (err.fromBowerder.length !==0) console.error('Oops it seems like: '+ err.fromBowerder.join(', ') +' occured a loading error from: bowerder');
+      if (err.fromBrowser.length !== 0) console.error('Oops it seems like: '+ err.fromBrowser.join(', ') +' occured a loading error from: browser');
+      if (err.fromBowerder.length !== 0) console.error('Oops it seems like: '+ err.fromBowerder.join(', ') +' occured a loading error from: bowerder');
       return null; // interruption 
    }
 
