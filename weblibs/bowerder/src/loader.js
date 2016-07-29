@@ -65,7 +65,7 @@ if (typeof bower !== 'undefined' && !(bower.components instanceof Object)) {
  * indeed, for local loading, the loader will considered that, dependencies and appropriates versions will be managed by `bower` through command tools (install, update, ...).
  * targeting a package's version can be done through this syntax: `pkg-name#version` (ex: vue#1.0.26). [see](https://semver.org) for supported version sementic.
  * 
- * @TODO (v0.4.0) thing about manage appropriate package's version to load (online loading mode) when have duplicate importation (seems that load the highest of two can be a good idea. ex: vue#1.0.25 < vue#1.0.26 then load vue#1.0.26)
+ * @TODO (v0.9.0 or higher) thing about manage appropriate package's version to load (online loading mode) when have duplicate importation (seems that load the highest of two can be a good idea. ex: vue#1.0.25 < vue#1.0.26 then load vue#1.0.26)
 */
 
 bower.dir = './bower_components';  // bower base directory
@@ -305,7 +305,7 @@ bower.attachPackageCB = function (node, pkgName) {
        // read https://github.com/requirejs/requirejs/issues/187
        // if we can NOT find [native code] then it must NOT natively supported.
        // in IE8, node.attachEvent does not have toString()
-       // Note the test for "[native code" with no closing brace, see: https://github.com/requirejs/requirejs/issues/273
+       // @NOTE the test for "[native code" with no closing brace, see: https://github.com/requirejs/requirejs/issues/273
        !(node.attachEvent.toString && node.attachEvent.toString().indexOf('[native code') < 0) &&
        !isOpera) {
       // Probably IE. IE (at least 6-8) do not fire script onload right after executing the script, so
@@ -525,8 +525,8 @@ bower.addPackage = function (pkgName, opts) {
       function fetchPackage( pkgName, pkgVersion, callback) {
 
          // @TODO change this hack to get `bower.json`'s package directly from bower's registry (if it's better)
-         // @TODO the package's versionn or range version will be send to the futur `bowerder api` that will determine the appropiate versoin to load (v0.5.0)
-         // @NOTE considering the previous to do, hope this hack will not be necessary with the futur online package's loading implementation from v0.5.0 
+         // @TODO the package's version or range version will be send to the futur `bowerder api` that will determine the appropiate versoin to load (v0.9.0 or v1.0.0)
+         // @NOTE considering the previous to do, hope this hack will not be necessary with the futur online package's loading implementation from v0.9.0 or v1.0.0
          bower.xhrGet('https://libraries.io/api/bower/'+ pkgName, true, function (reponse) {
             
             if (!reponse.error) {
@@ -985,7 +985,7 @@ if (bower.components === undefined) {
       bower.browser.regTag.onreadystatechange = bower.browser.regTag.onerror = bower.browser.regTag.onload;
 
       bower.browser.regTag.setAttribute('data-bowerpkg', '#bowerder');
-      bower.browser.regTag.src = bower.dir +'/.bowerreg.js';
+      bower.browser.regTag.src = bower.dir +'/bowerreg.js';
 
       document.head.appendChild( bower.browser.regTag );
    }

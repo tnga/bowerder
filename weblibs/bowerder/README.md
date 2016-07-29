@@ -43,7 +43,7 @@ bower.import('Materialize', function (err) {
 
    if (err.occured) {
       //you can know if occured error is from bowerder or browser loading process ;)
-      console.error('Oops it seems like `Materialize` isn\'t fully loaded from:'+ err.from) ;
+      console.error('Oops it seems like `Materialize` wasn\'t fully loaded by:'+ err.from) ;
       return null; // interruption 
    }
 
@@ -60,8 +60,8 @@ bower.ready( function (err) {
 
    if (err.occured) {
       //you can know which package have occured an error and if it is from bowerder or browser loading process ;)
-      if (err.fromBrowser) console.error('Oops it seems like: '+ err.fromBrowser.join(', ') +' occured a loading error from: browser');
-      if (err.fromBowerder) console.error('Oops it seems like: '+ err.fromBowerder.join(', ') +' occured a loading error from: bowerder');
+      if (err.fromBrowser.length !==0) console.error('Oops it seems like: '+ err.fromBrowser.join(', ') +' occured a loading error from: browser');
+      if (err.fromBowerder.length !==0) console.error('Oops it seems like: '+ err.fromBowerder.join(', ') +' occured a loading error from: bowerder');
       return null; // interruption 
    }
 
@@ -71,7 +71,25 @@ bower.ready( function (err) {
 });
 ```
 
-You have a custom external scripts or stylesheets for your project which use or overwrite some packages's features ?
+It's possible to load your bower packages via **online CDN service**. This is usefull for projects which don't provide local hosted dependencies *(codepen, jsfiddle, online demo, ...)*.
+For that purpose, just enable the `bower.cdn.usage` property. The actual CDN use by the loader is [cdn.rawgit.com](https://rawgit.com). That will cause online package's loading method to have priority to local loading.
+One of advantages of this functionality is the possibility to switch from local hosted dependencies to online hosting and vis versa, without change concerned code in a associated project.
+Bowerder will load by default the latest version of a package, but developer can target a version to load (https://semver.org); however it will be only considered by the loader for online loading mode through CDN.
+Indeed, for local loading, the loader will considered that, dependencies and appropriates versions will be managed by `bower` through command tools (install, update, ...).
+```js
+bower.cdn.usage = true ;
+
+bower.import("vue#1.0.26") ;
+bower.import("d3") ;
+bower.import("aos") ;
+
+bower.ready( function (err) {
+
+   alert("after all previous importation. [error: "+ err.occured +"]") ;
+}) ;
+```
+
+*You have a custom external scripts or stylesheets for your project which use or overwrite some packages's features ?*
 Don't worry, just simply include them and bowerder will import packages's main files before their loading;
 so that it will be like you have done it by yourself.
 *(except it's without stress or question like "which package's main file i have forgot and where to include ?")*
@@ -104,31 +122,14 @@ To avoid to run that command each time you make a bower operation (install, upda
 $ bowerder auto
 ```
 
-It's possible to load your bower packages via **online CDN service**. This is usefull for projects which don't provide local hosted dependencies *(codepen, jsfiddle, online demo, ...)*.
-For that purpose, just enable the `bower.cdn.usage` property. The actual CDN use by the loader is [cdn.rawgit.com](https://rawgit.com). That will cause online package's loading method to have priority to local loading.
-One of advantages of this functionality is the possibility to switch from local hosted dependencies to online hosting and vis versa, without change concerned code in a associated project.
-Bowerder will loaded by default the latest version of a package, but developer can target a version to load (https://semver.org); however it will be only considered by the loader with this online loading mode through CDN.
-Indeed, for local loading, the loader will considered that, dependencies and appropriates versions will be managed by `bower` through command tools (install, update, ...).
-```js
-bower.cdn.usage = true ;
-
-bower.import("vue#1.0.26") ;
-bower.import("d3") ;
-bower.import("aos") ;
-
-bower.ready( function (err) {
-
-   alert("after all previous importation. [error: "+ err.occured +"]") ;
-}) ;
-```
 In the browser, packages's configurations can be access via the `bower.components` properties; and imported packages's tree dependencies via the `bower.packagesTree` properties.
-What about to give more informations about libraries that powered a project ?
+*What about to give more informations about libraries that powered a project ?*
 ```js
 bower.ready( function (err) {
 
    if (err.occured) {
-      if (err.fromBrowser) console.error('Oops it seems that: '+ err.fromBrowser.join(', ') +' occured a loading error from: browser');
-      if (err.fromBowerder) console.error('Oops it seems that: '+ err.fromBowerder.join(', ') +' occured a loading error from: bowerder');
+      if (err.fromBrowser.length !==0) console.error('Oops it seems that: '+ err.fromBrowser.join(', ') +' occured a loading error from: browser');
+      if (err.fromBowerder.length !==0) console.error('Oops it seems that: '+ err.fromBowerder.join(', ') +' occured a loading error from: bowerder');
       return null; // interruption 
    }
 

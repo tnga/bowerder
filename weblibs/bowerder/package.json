@@ -1,9 +1,11 @@
 {
   "name": "bowerder",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "description": "the bower components loader for browsers",
-  "main": "src/manager.js",
-  "bin": "bin/bowerder",
+  "main": "./src/manager.js",
+  "bin": {
+    "bowerder": "./bin/bowerder"
+  },
   "engines": {
     "node": ">=0.10.0"
   },
