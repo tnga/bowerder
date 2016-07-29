@@ -65,6 +65,8 @@ if (typeof bower !== 'undefined' && !(bower.components instanceof Object)) {
  * indeed, for local loading, the loader will considered that, dependencies and appropriates versions will be managed by `bower` through command tools (install, update, ...).
  * targeting a package's version can be done through this syntax: `pkg-name#version` (ex: vue#1.0.26). [see](https://semver.org) for supported version sementic.
  * 
+ * developer can decide to include or exclude some package's associated files. that said, for exclusion, developer can use global selector `*` (ex: *.scss, theme-*.css) which isn't supported in inclusion case.
+ * 
  * @TODO (v0.9.0 or higher) thing about manage appropriate package's version to load (online loading mode) when have duplicate importation (seems that load the highest of two can be a good idea. ex: vue#1.0.25 < vue#1.0.26 then load vue#1.0.26)
 */
 
@@ -381,7 +383,9 @@ bower.parseTagType = function (targetFile) {
  * @param   {object}   opts associated options for importation process:
  *                           `caller`: package which depends of this (argument focused by `pkgName`) given package. usefull for dependencies management,
  *                          `version`: target package's version to load (only considered for online loading through CDN),
- *                              `cbi`: index of current associated callback in callbacks's registry (if given)
+ *                              `cbi`: index of current associated callback in callbacks's registry (if given),
+ *                          `include`: an array of extra package's files to also load, 
+ *                           `ignore`: an array of package's files to exclude and not load 
  */
 bower.addPackage = function (pkgName, opts) {
 
@@ -903,7 +907,11 @@ bower.addPackage = function (pkgName, opts) {
 /**
  * import packages "in the DOM" with their dependecies 
  * @param   {string}   pkgQuery  package's name (with a specified version, ex: name#1.0.0)
- * @param   {function} callback function to run after full package's importation
+ * @param   {function || object} options callback function to run after full package's importation
+ *                                       or an object with these properties:
+ *                                       `callback`: function to run,
+ *                                        `include`: an array of extra package's files to also load, 
+ *                                         `ignore`: an array of package's files to exclude and not load 
 */
 bower.import = function (pkgQuery, options) {
 
@@ -920,7 +928,7 @@ bower.import = function (pkgQuery, options) {
    pkgQuery = pkgQuery.join('#');
    
    var callback = undefined;
-   var cbIndex = undefined;
+   var cbIndex = undefined; // callback index
    var fileOpts = {include: [], ignore: []};
 
    if (options) {
