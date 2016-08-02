@@ -50,7 +50,7 @@ have fun ! *(components are loaded with their dependencies)*
 ```js
 bower.import('ijs') ;
 bower.import('vue') ;
-//with callback
+// with callback
 bower.import('Materialize', function (err) {
 
    if (err.occured) {
