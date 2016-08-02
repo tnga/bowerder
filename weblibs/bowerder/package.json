@@ -1,6 +1,6 @@
 {
   "name": "bowerder",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "description": "the bower components loader for browsers",
   "main": "./src/manager.js",
   "bin": {

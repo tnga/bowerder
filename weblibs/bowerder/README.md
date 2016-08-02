@@ -39,11 +39,11 @@ have fun ! *(components are loaded with their dependencies)*
 ```js
 bower.import('ijs') ;
 bower.import('vue') ;
-//with callback
+// with callback
 bower.import('Materialize', function (err) {
 
    if (err.occured) {
-      //you can know if occured error is from bowerder or browser loading process ;)
+      // you can know if occured error is from bowerder or browser loading process ;)
       console.error('Oops it seems like `Materialize` wasn\'t fully loaded by:'+ err.from) ;
       return null; // interruption 
    }
@@ -122,6 +122,8 @@ bower.ready( function (err) {
 });
 ```
 
+Take a look at this [codepen](http://codepen.io/tnga/pen/OXwjao) for tangible demo !
+
 #### how it work ?
 
 The recommended way to use boweder to import packages, is by providing a local registry for packages installed via bower.
@@ -132,7 +134,7 @@ $ bowerder
 ```
 it's done, all your installed packages's configurations will be available on the browser through bowerder and will be use for importation process.
 
-How about the size of that registry ? Not much, average is `~[15-20]kb` or `~[3-8]kb gzipped`  for 100 packages.
+*How about the size of that registry ?* Not much, average is `~[15-20]kb` or `~[3-8]kb gzipped`  for 100 packages.
 
 To avoid to run that command each time you make a bower operation (install, update, ...), just run the following command for automation:
 ```sh
