@@ -139,6 +139,9 @@ bower.ready( function (err) {
 ```
 
 
+Take a look at this [codepen](http://codepen.io/tnga/pen/OXwjao) for tangible demo !
+
+
 
 #### how it work ?
 
