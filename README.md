@@ -2,6 +2,7 @@
 > the bower components loader for browsers
 
 <p align="center"><img style="max-width: 100%" src="bowerder.png"></p>
+
 Easly Import your components or libraries installed via bower to your project.
 
 #### why shall i use it ?
@@ -59,7 +60,7 @@ bower.import('Materialize', function (err) {
 bower.ready( function (err) {
 
    if (err.occured) {
-      //you can know which package have occured an error and if it is from bowerder or browser loading process ;)
+      // you can know which package have occured an error and if it is from bowerder or browser loading process ;)
       if (err.fromBrowser.length !== 0) console.error('Oops it seems like: '+ err.fromBrowser.join(', ') +' occured a loading error from: browser');
       if (err.fromBowerder.length !== 0) console.error('Oops it seems like: '+ err.fromBowerder.join(', ') +' occured a loading error from: bowerder');
       return null; // interruption 
@@ -71,10 +72,10 @@ bower.ready( function (err) {
 });
 ```
 
-It's possible to load your bower packages via **online CDN service**. This is usefull for projects which don't provide local hosted dependencies *(codepen, jsfiddle, online demo, ...)*.
+It's possible to load your bower packages via **online CDN service**. This is useful for projects which don't provide local hosted dependencies *(codepen, jsfiddle, online demo, ...)*.
 For that purpose, just enable the `bower.cdn.usage` property. The actual CDN use by the loader is [cdn.rawgit.com](https://rawgit.com). That will cause online package's loading method to have priority to local loading.
 One of advantages of this functionality is the possibility to switch from local hosted dependencies to online hosting and vis versa, without change concerned code in a associated project.
-Bowerder will load by default the latest version of a package, but developer can target a version to load (https://semver.org); however it will be only considered by the loader for online loading mode through CDN.
+Bowerder will load by default the latest version of a package, but developer can target a [version](https://semver.org) to load ; however it will be only considered by the loader for online loading mode through CDN.
 Indeed, for local loading, the loader will considered that, dependencies and appropriates versions will be managed by `bower` through command tools (install, update, ...).
 ```js
 bower.cdn.usage = true ;
@@ -123,7 +124,7 @@ bower.ready( function (err) {
 
 #### how it work ?
 
-The recommended way to use boweder to import packages, is by provide a local registry for packages installed via bower.
+The recommended way to use boweder to import packages, is by providing a local registry for packages installed via bower.
 This can be done by simply run the boweder command line tool on your target project's directory. 
 *abrakadabra !!!*
 ```sh
@@ -138,7 +139,7 @@ To avoid to run that command each time you make a bower operation (install, upda
 $ bowerder auto
 ```
 
-In the browser, packages's configurations can be access via the `bower.components` properties; and imported packages's tree dependencies via the `bower.packagesTree` properties.
+In the browser, packages's configurations can be access via the `bower.components` property; and imported packages's tree dependencies via the `bower.packagesTree` property.
 *What about to give more informations about libraries that powered a project ?*
 ```js
 bower.ready( function (err) {
@@ -184,7 +185,7 @@ bower.devMode = true;
 ```
 
 Bowerder way is simple. Except the usage of feature like `import` provided by es6-next, for those who think that, 
-concatanation of their modules's main files in big one is the only way to really optimize loading on browsers have to note that it is disputable;
+concatanation of their modules's main files in big one is the only way to really optimize loading on browsers, have to note that it is disputable;
 specially in development purpose. Ask yourself why best download manager use to download file in mutiple sub-parts even if that implies more requests to send.
 Likewise, server can be configured to send compressed files to client so that transactions become faster. Even if one time download can be a solution, 
 it can have a little negative influence on pages rendering process.
@@ -210,14 +211,14 @@ automate building task with your modifications:
 $ gulp watch
 ```
 
-Minification is a way for developer to have for some files a better loading optimization. However, `bower.json` spec do not allow to use minified files as mains files for a component.
+Minification is a way for developer to have for some files a better loading optimization. However, `bower.json` spec do not allow to use minified files as main files for a component.
 Developers use to set associated `main` property with sources or developments files. Considering how web projects are now build, that pratice isn't advantageous for browsers.
 Indeed, set an `index.scss`, `index.coffee` or an unminified `index.js` files *(depending of size)* for production as main files isn't actually good for browsers to digest.
-That why bowerder now recommended to also set a `browser: []` *(or `browser: {main: []}`)* property for mains files that browsers can easly digest. Minified files with sourcemaps are specialy welcome in that case.
+That why bowerder now recommended to also set a `browser: []` *(or `browser: {main: []}`)* property for main files that browsers can easly digest. Minified files with sourcemaps are specialy welcome in that case.
 
 > If you like this module, you can give it a star and try to *pull request* to some libraries's repository like [bootstrap](http://github.com/twbs/bootstrap) which don't yet respect that behavior.
 
-bowerder will use `browser: []` properties to load component's main files; if they aren't set, it will use the `main` property as default. 
+bowerder will use `browser: []` property to load component's main files; if it isn't set, it will use the `main` property as default. 
 
 **showcase**: *[font-awesome](http:////github.com/FortAwesome/Font-Awesome)'s* `bower.json`
 ```json
